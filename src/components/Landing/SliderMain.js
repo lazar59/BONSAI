@@ -218,9 +218,7 @@ const Slidermain = () => {
             </div>
           </div>
           <div className='col-lg-6 col-md-12 move-first flex align-items-center justify-center'>
-            <Zoom className="align-items-center" delay={600} duration={1000} triggerOnce>
-              <img src="/img/banner.png" className="crypto-logo-img" alt="BONSAI" />
-            </Zoom>
+            <img src="/img/banner.png" className="crypto-logo-img" alt="BONSAI" />
           </div>
         </div>
       </div>

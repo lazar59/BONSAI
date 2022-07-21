@@ -1,20 +1,5 @@
 import React, { Component } from "react";
-import { CircularProgressbarWithChildren, buildStyles } from "react-circular-progressbar";
 import { getUTCNow } from '../utils';
-
-function CapGradientSVG({ start }) {
-  const gradientTransform = `rotate(90)`;
-  return (
-    <svg style={{ height: 0 }}>
-      <defs>
-        <linearGradient id={"cap"} gradientTransform={gradientTransform}>
-          <stop offset="0%" stopColor={start ? "#FF4336" : "#13ff00"} />
-          <stop offset="100%" stopColor={start ? "#FEC601" : "#b5fd00"} />
-        </linearGradient>
-      </defs>
-    </svg>
-  );
-}
 
 class Clock extends Component {
   constructor(props) {
@@ -67,64 +52,20 @@ class Clock extends Component {
     return (
       <div className="d-flex justify-evenly mt-3">
         <div className="Clock-item">
-          <CapGradientSVG start={this.props.startPresale} />
-          <CircularProgressbarWithChildren value={this.state.daysPer}
-            strokeWidth="5"
-            styles={buildStyles({
-              pathColor: `url(#cap)`,
-              trailColor: 'rgb(255,255,255,0.05)',
-              strokeLinecap: "butt"
-            })}>
-            <div className="flex flex-col">
-              <span className="clock-time">{this.leading0(this.state.days)}</span>
-              <span className="clock-text">Days</span>
-            </div>
-          </CircularProgressbarWithChildren>
+          <span className="clock-time">{this.leading0(this.state.days)}</span>
+          <span className="clock-text">Days</span>
+        </div>
+        <div className="Clock-item Clock-item-ex">
+          <span className="clock-time">{this.leading0(this.state.hours)}</span>
+          <span className="clock-text">HRS</span>
         </div>
         <div className="Clock-item">
-          <CapGradientSVG />
-          <CircularProgressbarWithChildren value={this.state.hoursPer}
-            strokeWidth="5"
-            styles={buildStyles({
-              pathColor: `url(#cap)`,
-              trailColor: 'rgb(255,255,255,0.05)',
-              strokeLinecap: "butt"
-            })}>
-            <div className="flex flex-col">
-              <span className="clock-time">{this.leading0(this.state.hours)}</span>
-              <span className="clock-text">Hours</span>
-            </div>
-          </CircularProgressbarWithChildren>
+          <span className="clock-time">{this.leading0(this.state.minutes)}</span>
+          <span className="clock-text">MINS</span>
         </div>
-        <div className="Clock-item">
-          <CapGradientSVG />
-          <CircularProgressbarWithChildren value={this.state.minPer}
-            strokeWidth="5"
-            styles={buildStyles({
-              pathColor: `url(#cap)`,
-              trailColor: 'rgb(255,255,255,0.05)',
-              strokeLinecap: "butt"
-            })}>
-            <div className="flex flex-col">
-              <span className="clock-time">{this.leading0(this.state.minutes)}</span>
-              <span className="clock-text">Mins</span>
-            </div>
-          </CircularProgressbarWithChildren>
-        </div>
-        <div className="Clock-item">
-          <CapGradientSVG />
-          <CircularProgressbarWithChildren value={this.state.secPer}
-            strokeWidth="5"
-            styles={buildStyles({
-              pathColor: `url(#cap)`,
-              trailColor: 'rgb(255,255,255,0.05)',
-              strokeLinecap: "butt"
-            })}>
-            <div className="flex flex-col">
-              <span className="clock-time">{this.leading0(this.state.seconds)}</span>
-              <span className="clock-text">Secs</span>
-            </div>
-          </CircularProgressbarWithChildren>
+        <div className="Clock-item Clock-item-ex">
+          <span className="clock-time">{this.leading0(this.state.seconds)}</span>
+          <span className="clock-text">SEC</span>
         </div>
       </div>
     );

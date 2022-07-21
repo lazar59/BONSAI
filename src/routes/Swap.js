@@ -10,6 +10,8 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { toast } from 'react-toastify';
 import ReactToolTip from 'react-tooltip';
+import MainHeader from '../components/menu/MainHeader';
+import Sidebar from '../components/App/Sidebar';
 import * as selectors from '../store/selectors';
 import SelectCoin from '../components/swap/SelectSwapCoin';
 import { fadeInUp, numberWithCommas } from '../components/utils';
@@ -27,9 +29,24 @@ const GlobalStyles = createGlobalStyle`
     background-size: cover !important;
     background-position-x: center !important;
     padding: 20px;
+    padding-top: 100px;
     @media only screen and (max-width: 1200px) {
       .col {
         width: 100%;
+      }
+    }
+    .swap-header {
+      max-width: 900px;
+      padding: 20px;
+      margin: auto;
+      .swap-title {
+        font-size: 46px;
+        font-family: "PoetsenOne";
+        text-align: center;
+        color: black;
+      }
+      .swap-desc {
+        font-size: 20px;
       }
     }
   }
@@ -58,12 +75,13 @@ const GlobalStyles = createGlobalStyle`
 
   .input-token-panel {
     display: flex;
-    background-color: #151b344d;
-    border: solid 1px #5947FF;
+    background-color: white;
+    border: 2px solid #96BF49;
     border-radius: 20px;
     flex-direction: column;
     text-align: left;
     padding: 20px 16px 10px;
+    color: black;
     gap: 10px;
   }
 
@@ -71,9 +89,9 @@ const GlobalStyles = createGlobalStyle`
     width: 60%;
     background: transparent;
     outline: none;
-    font-family: 'CenturyGothicB';
-    font-size: 22px;
-    color: #ffb84d;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 36px;
+    color: #96bf49;
     white-space: nowrap;
     text-overflow: ellipsis;
   }
@@ -90,17 +108,20 @@ const GlobalStyles = createGlobalStyle`
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 16px;
       font-weight: 400;
-      color: white;
+      color: black;
+      border: 1px solid #96bf49;
+      border-radius: 10px;
       white-space: nowrap;
       text-overflow: ellipsis;
     }
   }  
 
   .btn-change {
-    background-color: #ffb84d !important;
+    background-color: #96bf49 !important;
     border-radius: 50% !important;
+    color: white !important;
     &:hover {
-      background: #e9c083 !important;
+      background: #88b72f !important;
     }
   }
 
@@ -110,7 +131,8 @@ const GlobalStyles = createGlobalStyle`
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 18px;
     border-radius: 8px;
-    background: linear-gradient(90deg, #7A1BFF -3.88%, #5947FF 100%);
+    background: linear-gradient(90deg,#96bf49 -3.88%,#5f910c 100%);
+    color: white;
     &.approve {
       background: #4ed047;
     }
@@ -123,7 +145,7 @@ const GlobalStyles = createGlobalStyle`
     padding: 0px 5px;
     margin: 10px 10px 10px 0px;
     &:hover {
-      background: #4c3486;
+      background: #f0f6e5;
       border-radius: 8px;
     }
   }
@@ -138,13 +160,14 @@ const GlobalStyles = createGlobalStyle`
   }
 
   .swap-color {
-    color: #ffb84d;
+    color: #96bf49;
   }
 
   .MuiChip-label {
     padding-left: 8px;
     padding-right: 8px;
     font-size: 18px;
+    color: #96BF49;
   }
 
   .calc-label {
@@ -161,7 +184,8 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 400,
-  bgcolor: '#271c63',
+  bgcolor: 'white',
+  color: 'black',
   borderRadius: '20px',
   boxShadow: 24,
   pt: 4,
@@ -170,16 +194,16 @@ const style = {
 };
 
 const magic_coin = [
-  { code: 2, label: '$MGV' },
+  { code: 2, label: 'BONSAI' },
 ];
 
 const coinLabel = (arrange, coinType) => {
   if (arrange && coinType === 0) {
-    return 'AVAX';
+    return 'BNB';
   } else if (arrange && coinType === 1) {
-    return 'USDC';
+    return 'BUSD';
   } else {
-    return '$MGV';
+    return 'BONSAI';
   }
 }
 
@@ -200,7 +224,7 @@ const Swap = (props) => {
   const [providerFee, setProviderFee] = useState(0);
   const [amountPerMagic, setAmountPerMagic] = useState(0);
   const [slippage, setSlippage] = useState(AUTO_SLIPPAGE);
-  const [reserves, setReserves] = useState([]); // 0: $MGV 1: USDC
+  const [reserves, setReserves] = useState([]); // 0: BONSAI 1: USDC
   const [priceImpact, setPriceImpact] = useState(0);
   const [amountMinMax, setAmountMinMax] = useState(0);
 
@@ -344,7 +368,7 @@ const Swap = (props) => {
           let amountOut = ret_val.amountOut;
           if (!arrange)
             amountOut = amount;
-          priceImpactCalculation(reserves[0], amountOut);  // If destination(To amount) is $MGV, the impact has been calculated with only $MGV.
+          priceImpactCalculation(reserves[0], amountOut);  // If destination(To amount) is BONSAI, the impact has been calculated with only BONSAI.
         } else {
           setTokenAmountB('');
         }
@@ -357,12 +381,12 @@ const Swap = (props) => {
         if (ret_val.success === true) {
           setTokenAmountA(ret_val.amountIn);
           setAmountMinMax(ret_val.amountIn * (1 + slippage / 100));
-          const reserve = receiveCoinType === '$MGV' ? reserves[0] : reserves[1];
+          const reserve = receiveCoinType === 'BONSAI' ? reserves[0] : reserves[1];
           priceImpactCalculation(reserve, ret_val.amountIn);
           let amountOut = amount;
           if (!arrange)
             amountOut = ret_val.amountIn;
-          priceImpactCalculation(reserves[0], amountOut);  // If destination(To amount) is $MGV, the impact has been calculated with only $MGV.
+          priceImpactCalculation(reserves[0], amountOut);  // If destination(To amount) is BONSAI, the impact has been calculated with only BONSAI.
         } else {
           setTokenAmountA('');
         }
@@ -370,7 +394,7 @@ const Swap = (props) => {
     }
   }
 
-  const priceImpactCalculation = (reserve, amountTraded) => { // reserve should be $MGV.
+  const priceImpactCalculation = (reserve, amountTraded) => { // reserve should be BONSAI.
     const fee = 0.003;
     const amountInWithFee = Number(amountTraded * (1 - fee))
     const reserveTokenFrom = Number(reserve)
@@ -383,15 +407,15 @@ const Swap = (props) => {
     let type = 0;
     if (exactToken) {
       if (coin_arrange) {
-        type = '$MGV';
+        type = 'BONSAI';
       } else {
-        type = coinType === 0 ? 'AVAX' : 'USDC';
+        type = coinType === 0 ? 'BNB' : 'BUSD';
       }
     } else {
       if (coin_arrange) {
-        type = coinType === 0 ? 'AVAX' : 'USDC';
+        type = coinType === 0 ? 'BNB' : 'BUSD';
       } else {
-        type = '$MGV';
+        type = 'BONSAI';
       }
     }
     return type;
@@ -399,7 +423,7 @@ const Swap = (props) => {
 
   const addTokenCallback = useCallback(async () => {
     const tokenAddress = config.MagicAddress;
-    const tokenSymbol = '$MGV';
+    const tokenSymbol = 'BONSAI';
     const tokenDecimals = 18;
     const tokenImage = `https://raw.githubusercontent.com/traderjoe-xyz/joe-tokenlists/main/logos/${config.MagicAddress}/logo.png`;
 
@@ -418,9 +442,9 @@ const Swap = (props) => {
       });
 
       if (wasAdded) {
-        console.log('Adding $MGV token');
+        console.log('Adding BONSAI token');
       } else {
-        console.log('$MGV token has been added to you wallet!')
+        console.log('BONSAI token has been added to you wallet!')
       }
     } catch (error) {
       console.log(error);
@@ -468,14 +492,14 @@ const Swap = (props) => {
   useEffect(() => {
     let price = 0;
     let tax = 0;
-    if (coin_arrange && Number(tokenAmountB) > 0) { 
+    if (coin_arrange && Number(tokenAmountB) > 0) {
       price = Number(tokenAmountA) / Number(tokenAmountB);
       tax = Number(tokenAmountB) * def_config.BUY_FEE;
     } else if (!coin_arrange && Number(tokenAmountA) > 0) {
       price = Number(tokenAmountB) / Number(tokenAmountA);
       tax = Number(tokenAmountA) * def_config.SELL_FEE;
     }
-    
+
     setTradingTax(tax);
     setAmountPerMagic(numberWithCommas(price, 10));
     setProviderFee(Number(tokenAmountA) * SWAP_FEE);
@@ -512,128 +536,136 @@ const Swap = (props) => {
   }, [initialize]);
 
   return (
-    <div className='page-container swap-container'>
-      <GlobalStyles />
-      <div className='flex flex-column full-width'>
-        <div className='row row-gap-2 justify-center'>
-          <div className='col-xl-5 col-lg-12 align-items-stretch pb-3'>
-            <Reveal keyframes={fadeInUp} className='onStep' delay={0} duration={800} triggerOnce>
-              <div className='swap-title'>
-                <span className='fs-18 mb-2'>&nbsp;</span>
-              </div>
-            </Reveal>
-            <Reveal className='full-card text-center flex flex-column justify-center align-items-center full-height onStep'
-              keyframes={fadeInUp} delay={400} duration={800} triggerOnce>
-              <>
-                <div className='main-card pb-2 full-width'>
-                  <div className="flex align-items-center justify-between">
-                    <div className='flex-column text-left'>
-                      <span className='fs-24 fw-bold ls-1 mb-0 text-left'>SWAP FOR $MGV</span>
-                      {coin_arrange ? (
-                        <p className='f-medium'>Buy $MGV below using <b>AVAX</b> or <b>USDC</b></p>
-                      ) : (
-                        <p className='f-medium'>Sell <b>$MGV</b> below</p>
-                      )}
+    <>
+      <MainHeader showMenu={false} />
+      <div className='container swap-container relative'>
+        <Sidebar />
+        <GlobalStyles />
+        <div className='swap-header'>
+          <Reveal className='onStep' keyframes={fadeInUp} delay={0} duration={600} triggerOnce>
+            <p className='swap-title'>SWAP ASSETS</p>
+          </Reveal>
+        </div>
+        <div className='flex flex-column full-width'>
+          <div className='row row-gap-2 justify-center'>
+            <div className='col-xl-6 col-lg-12 align-items-stretch pb-3'>
+              <Reveal keyframes={fadeInUp} className='onStep' delay={0} duration={800} triggerOnce>
+                <div className='swap-title'>
+                  <span className='fs-18 mb-2'>&nbsp;</span>
+                </div>
+              </Reveal>
+              <Reveal className='full-card text-center flex flex-column justify-center align-items-center full-height onStep'
+                keyframes={fadeInUp} delay={400} duration={800} triggerOnce>
+                <>
+                  <div className='main-card pb-2 full-width'>
+                    <div className="flex align-items-center justify-between">
+                      <div className='flex-column text-left'>
+                        <span className='fs-24 fw-bold ls-1 mb-0 text-left text-black'>SWAP FOR BONSAI</span>
+                        {coin_arrange ? (
+                          <p className='f-medium text-black'>Buy BONSAI below using <b>BNB</b></p>
+                        ) : (
+                          <p className='f-medium text-black'>Sell <b>BONSAI</b> below</p>
+                        )}
+                      </div>
+                      <IconButton component="span" sx={{ color: '#96bf49' }} onClick={handleOpen}>
+                        <i className="fa-light fa-gear"></i>
+                      </IconButton>
                     </div>
-                    <IconButton component="span" sx={{ color: '#ffb84d' }} onClick={handleOpen}>
-                      <i className="fa-light fa-gear"></i>
-                    </IconButton>
-                  </div>
-                  <div className="input-token-panel">
-                    <div className='flex justify-between'>
-                      <span className="fs-18 f-medium">From</span>
-                      <span className='fs-18 f-medium cursor-pointer' onClick={() => handleSwapMax(1)}>Balance: {numberWithCommas(fromBalance)}</span>
-                    </div>
-                    <div className="d-flex justify-content-between">
-                      <input type="number" className="input-token" name="input_from" placeholder='0.0' value={tokenAmountA} onChange={onChangeTokenAmountA} disabled></input>
-                      {coin_arrange ? (
-                        <button className='btn-max swap-color' onClick={() => handleFromPercent(100)}>MAX</button>
-                      ) : (
-                        <>
-                          <button className='btn-max swap-color' onClick={() => handleFromPercent(20)}>20%</button>
-                          <button className='btn-max swap-color' onClick={() => handleFromPercent(50)}>50%</button>
-                        </>
-                      )}
-                      {coin_arrange ? (
-                        <SelectCoin className='select-coin' value={coinType} onChange={handleSelectCoin} />
-                      ) : (
-                        <SelectCoin className='select-coin' value={2} coins={magic_coin} />
-                      )}
-                    </div>
-                  </div>
-                  <IconButton component="span" className="btn-change mt-2 mb-2 mx-auto w-10 h-10" onClick={onClick_ChangeCoin}>
-                    <i className="fa-regular fa-arrow-down-arrow-up"></i>
-                  </IconButton>
-                  <div className="input-token-panel">
-                    <div className='flex justify-between'>
-                      <span className="fs-18 f-medium">To</span>
-                      <span className='fs-18 f-medium cursor-pointer' onClick={() => handleSwapMax(2)}>Balance: {numberWithCommas(toBalance)}</span>
-                    </div>
-                    <div className="d-flex justify-content-between">
-                      <input type="number" className="input-token" name="input_from" placeholder='0.0' value={tokenAmountB} onChange={onChangeTokenAmountB} disabled></input>
-                      {coin_arrange ? (
-                        <SelectCoin className='select-coin' value={2} coins={magic_coin} />
-                      ) : (
-                        <SelectCoin className='select-coin' value={coinType} onChange={handleSelectCoin} />
-                      )}
-                    </div>
-                  </div>
-                  <div className='flex flex-column mt-3'>
-                    <div className='flex justify-between'>
-                      <p className='text-gray'>Price</p>
-                      <span className='fs-16'>{numberWithCommas(amountPerMagic, 8)} {coinType === 0 ? 'AVAX' : 'USDC'} per $MGV</span>
-                    </div>
-                    <div className='flex justify-between'>
-                      <p className='text-gray'>Slippage Tolerance</p>
-                      <span className='fs-16'>{slippage} %</span>
-                    </div>
-                    <div className='flex justify-between'>
-                      {coin_arrange ? (
-                        <p className='text-center fs-14 text-gray mb-0'>Buy Tax (15%)</p>
-                      ) : (
-                        <>
-                          <a className='text-center fs-14 text-gray hover:text-white cursor-pointer' data-tip data-for="main">Sell Tax (30%)</a>
-                          <ReactToolTip className='tooltip' id="main" place={'top'} backgroundColor='#702ce9' textColor='white' type="dark" effect="solid" multiline={true}>
-                            <span>Current Sell tax is subject to change. We've launched with 30% and will be reducing this % in the near term. We recommend holding your $MGV.</span>
-                          </ReactToolTip>
-                        </>
-                      )}
-                      <span className='fs-16'>{numberWithCommas(tradingTax)}</span>
-                    </div>
-                  </div>
-                  <div className='flex mt-2'>
-                    {(tokenAmountA === '' || tokenAmountA === 0 || tokenAmountB === '' || tokenAmountB === 0) ? (
-                      <button className="btn-swap" disabled>Enter an amount</button>
-                    ) : (
-                      <>
-                        {insufficient ? (
-                          <button className="btn-swap" disabled>Insufficient {coinLabel(coin_arrange, coinType)} balance</button>
+                    <div className="input-token-panel">
+                      <div className='flex justify-between'>
+                        <span className="fs-18 f-bold">From</span>
+                        <span className='fs-18 cursor-pointer' onClick={() => handleSwapMax(1)}>Balance: {numberWithCommas(fromBalance)}</span>
+                      </div>
+                      <div className="d-flex justify-content-between">
+                        <input type="number" className="input-token" name="input_from" placeholder='0.0' value={tokenAmountA} onChange={onChangeTokenAmountA} disabled></input>
+                        {coin_arrange ? (
+                          <button className='btn-max swap-color' onClick={() => handleFromPercent(100)}>MAX</button>
                         ) : (
                           <>
-                            {priceImpact > 90 ? (
-                              <button className="btn-swap" disabled>Insufficient liquidity for this trade.</button>
-                            ) : (
-                              <>
-                                {priceImpact >= 15 ? (
-                                  <button className="btn-swap" disabled>Price Impact Too High</button>
-                                ) : (
-                                  <>
-                                    {coin_arrange ? !isApprovedUSDC && (
-                                      <button className="btn-swap approve" onClick={onClick_ApproveUSDC}>Approve USDC</button>
-                                    ) : !isApprovedASTRO && (
-                                      <button className="btn-swap approve" onClick={onClick_ApproveASTRO}>Approve $MGV</button>
-                                    )}
-                                    <button className="btn-swap" onClick={handleSwap} disabled={coin_arrange ? !isApprovedUSDC && 'disabled' : !isApprovedASTRO && 'disabled'}>SWAP</button>
-                                  </>
-                                )}
-                              </>
-                            )}
+                            <button className='btn-max swap-color' onClick={() => handleFromPercent(20)}>20%</button>
+                            <button className='btn-max swap-color' onClick={() => handleFromPercent(50)}>50%</button>
                           </>
                         )}
-                      </>
-                    )}
+                        {coin_arrange ? (
+                          <SelectCoin className='select-coin' value={coinType} onChange={handleSelectCoin} />
+                        ) : (
+                          <SelectCoin className='select-coin' value={2} coins={magic_coin} />
+                        )}
+                      </div>
+                    </div>
+                    <IconButton component="span" className="btn-change mt-2 mb-2 mx-auto w-10 h-10" onClick={onClick_ChangeCoin}>
+                      <i className="fa-regular fa-arrow-down-arrow-up"></i>
+                    </IconButton>
+                    <div className="input-token-panel">
+                      <div className='flex justify-between'>
+                        <span className="fs-18 f-bold">To</span>
+                        <span className='fs-18 cursor-pointer' onClick={() => handleSwapMax(2)}>Balance: {numberWithCommas(toBalance)}</span>
+                      </div>
+                      <div className="d-flex justify-content-between">
+                        <input type="number" className="input-token" name="input_from" placeholder='0.0' value={tokenAmountB} onChange={onChangeTokenAmountB} disabled></input>
+                        {coin_arrange ? (
+                          <SelectCoin className='select-coin' value={2} coins={magic_coin} />
+                        ) : (
+                          <SelectCoin className='select-coin' value={coinType} onChange={handleSelectCoin} />
+                        )}
+                      </div>
+                    </div>
+                    <div className='flex flex-column mt-3'>
+                      <div className='flex justify-between'>
+                        <p>Price</p>
+                        <span className='fs-16'>{numberWithCommas(amountPerMagic, 8)} {coinType === 0 ? 'BNB' : 'BUSD'} per BONSAI</span>
+                      </div>
+                      <div className='flex justify-between'>
+                        <p>Slippage Tolerance</p>
+                        <span className='fs-16'>{slippage} %</span>
+                      </div>
+                      <div className='flex justify-between'>
+                        {coin_arrange ? (
+                          <p className='text-center fs-14 text-black mb-0'>Buy Tax (15%)</p>
+                        ) : (
+                          <>
+                            <a className='text-center fs-14 text-black hover:text-white cursor-pointer' data-tip data-for="main">Sell Tax (30%)</a>
+                            <ReactToolTip className='tooltip' id="main" place={'top'} backgroundColor='#702ce9' textColor='white' type="dark" effect="solid" multiline={true}>
+                              <span>Current Sell tax is subject to change. We've launched with 30% and will be reducing this % in the near term. We recommend holding your BONSAI.</span>
+                            </ReactToolTip>
+                          </>
+                        )}
+                        <span className='fs-16'>{numberWithCommas(tradingTax)}</span>
+                      </div>
+                    </div>
+                    <div className='flex mt-2'>
+                      {(tokenAmountA === '' || tokenAmountA === 0 || tokenAmountB === '' || tokenAmountB === 0) ? (
+                        <button className="btn-swap" >Enter an amount</button>
+                      ) : (
+                        <>
+                          {insufficient ? (
+                            <button className="btn-swap" >Insufficient {coinLabel(coin_arrange, coinType)} balance</button>
+                          ) : (
+                            <>
+                              {priceImpact > 90 ? (
+                                <button className="btn-swap" >Insufficient liquidity for this trade.</button>
+                              ) : (
+                                <>
+                                  {priceImpact >= 15 ? (
+                                    <button className="btn-swap" >Price Impact Too High</button>
+                                  ) : (
+                                    <>
+                                      {coin_arrange ? !isApprovedUSDC && (
+                                        <button className="btn-swap approve" onClick={onClick_ApproveUSDC}>Approve BUSD</button>
+                                      ) : !isApprovedASTRO && (
+                                        <button className="btn-swap approve" onClick={onClick_ApproveASTRO}>Approve BONSAI</button>
+                                      )}
+                                      <button className="btn-swap" onClick={handleSwap} disabled={coin_arrange ? !isApprovedUSDC && 'disabled' : !isApprovedASTRO && 'disabled'}>SWAP</button>
+                                    </>
+                                  )}
+                                </>
+                              )}
+                            </>
+                          )}
+                        </>
+                      )}
 
-                    {/* 
+                      {/* 
                     {(tokenAmountA === '' || tokenAmountA === 0 || tokenAmountB === '' || tokenAmountB === 0) ? (
                       <button className="btn-swap" disabled>Enter an amount</button>
                     ) : (insufficient ? (
@@ -645,70 +677,71 @@ const Swap = (props) => {
                         {coin_arrange ? !isApprovedUSDC && (
                           <button className="btn-swap approve" onClick={onClick_ApproveUSDC}>Approve USDC</button>
                         ) : !isApprovedASTRO && (
-                          <button className="btn-swap approve" onClick={onClick_ApproveASTRO}>Approve $MGV</button>
+                          <button className="btn-swap approve" onClick={onClick_ApproveASTRO}>Approve BONSAI</button>
                         )}
                         <button className="btn-swap" onClick={handleSwap} disabled={coin_arrange ? !isApprovedUSDC && 'disabled' : !isApprovedASTRO && 'disabled'}>SWAP</button>
                       </>
                     ))} */}
+                    </div>
+                    <div className='flex justify-center align-items-center gap-3 mt-2 cursor-pointer' onClick={addTokenCallback}>
+                      <img src="/img/icons/metamask.png" alt="" width="30"></img>
+                      <span className='fs-14'> Add BONSAI token to MetaMask</span>
+                    </div>
                   </div>
-                  <div className='flex justify-center align-items-center gap-3 mt-2 cursor-pointer' onClick={addTokenCallback}>
-                    <img src="/img/icons/metamask.png" alt="" width="30"></img>
-                    <span className='fs-14'> Add $MGV token to MetaMask</span>
+                  <div className='main-card flex flex-column full-width mt-2' style={{ height: '120px' }}>
+                    <div className='flex justify-between'>
+                      {exactToken ? (
+                        <p>Minimum received</p>
+                      ) : (
+                        <p>Maximum sold</p>
+                      )}
+                      <p>{numberWithCommas(amountMinMax, 5)} {receiveCoinType}</p>
+                    </div>
+                    <div className='flex justify-between'>
+                      <p>Price Impact</p>
+                      <p className={priceImpact < 3 ? 'text-green' : priceImpact < 15 ? 'text-warning' : 'text-error'}>{priceImpact < 0.01 ? '< 0.01%' : priceImpact + '%'}</p>
+                    </div>
+                    <div className='flex justify-between'>
+                      <p>Liquidity Provider Fee</p>
+                      <p>{numberWithCommas(providerFee, 8)} {coinLabel(coin_arrange, coinType)}</p>
+                    </div>
                   </div>
-                </div>
-                <div className='main-card flex flex-column full-width mt-2' style={{ height: '120px' }}>
-                  <div className='flex justify-between'>
-                    {exactToken ? (
-                      <p className='text-gray'>Minimum received</p>
-                    ) : (
-                      <p className='text-gray'>Maximum sold</p>
-                    )}
-                    <p>{numberWithCommas(amountMinMax, 5)} {receiveCoinType}</p>
-                  </div>
-                  <div className='flex justify-between'>
-                    <p className='text-gray'>Price Impact</p>
-                    <p className={priceImpact < 3 ? 'text-green' : priceImpact < 15 ? 'text-warning' : 'text-error'}>{priceImpact < 0.01 ? '< 0.01%' : priceImpact + '%'}</p>
-                  </div>
-                  <div className='flex justify-between'>
-                    <p className='text-gray'>Liquidity Provider Fee</p>
-                    <p>{numberWithCommas(providerFee, 8)} {coinLabel(coin_arrange, coinType)}</p>
-                  </div>
-                </div>
-              </>
-            </Reveal>
+                </>
+              </Reveal>
+            </div>
           </div>
         </div>
-      </div>
-      <Modal
-        open={openModal}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Settings
-          </Typography>
-          <div id="modal-modal-description" className="mt-3">
-            <div className="flex flex-column">
-              <p className='text-gray'>Slippage tolerance</p>
-              <div className="d-flex justify-content-between gap-2">
-                <div className='slippage-form flex align-items-center'>
-                  <input type="number" className="input-slippage" name="input_from" placeholder='0.0' onChange={(e) => handleSlippage(e.target.value)}></input>
-                  <span className='fs-20 text-white px-2'>%</span>
-                </div>
-                <div className='flex align-items-center'>
-                  <Chip label="0.1%" className='fs-20' variant={slippage === 0.1 ? 'filled' : ''} onClick={() => handleSlippage(0.1)} />
-                  <Chip label="0.5%" className='fs-20' variant={slippage === 0.5 ? 'filled' : ''} onClick={() => handleSlippage(0.5)} />
-                  <Chip label="1.0%" className='fs-20' variant={slippage === 1 ? 'filled' : ''} onClick={() => handleSlippage(1)} />
-                  <Chip label="Auto" className='fs-20' variant={slippage === 0 ? 'filled' : ''} onClick={() => handleSlippage(AUTO_SLIPPAGE)} />
+        <Modal
+          open={openModal}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h6" component="h2" color="common.black">
+              Settings
+            </Typography>
+            <div id="modal-modal-description" className="mt-3">
+              <div className="flex flex-column">
+                <p className='text-black'>Slippage tolerance</p>
+                <div className="d-flex justify-content-between gap-2">
+                  <div className='slippage-form flex align-items-center'>
+                    <input type="number" className="input-slippage" name="input_from" placeholder='0.0' onChange={(e) => handleSlippage(e.target.value)}></input>
+                    <span className='fs-20 text-black px-2'>%</span>
+                  </div>
+                  <div className='flex align-items-center'>
+                    <Chip label="0.1%" className='fs-20' variant={slippage === 0.1 ? 'filled' : ''} onClick={() => handleSlippage(0.1)} />
+                    <Chip label="0.5%" className='fs-20' variant={slippage === 0.5 ? 'filled' : ''} onClick={() => handleSlippage(0.5)} />
+                    <Chip label="1.0%" className='fs-20' variant={slippage === 1 ? 'filled' : ''} onClick={() => handleSlippage(1)} />
+                    <Chip label="Auto" className='fs-20' variant={slippage === 0 ? 'filled' : ''} onClick={() => handleSlippage(AUTO_SLIPPAGE)} />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </Box>
-      </Modal>
-    </div >
+          </Box>
+        </Modal>
+      </div >
+    </>
   );
 };
 

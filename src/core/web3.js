@@ -33,8 +33,7 @@ if (typeof window !== "undefined") {
           },
         },
       },
-    }, // required
-    theme: "dark",
+    } // required
   });
 }
 

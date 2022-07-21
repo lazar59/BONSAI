@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import styled, { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle } from 'styled-components';
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 import { useMediaQuery } from 'react-responsive';
 import Reveal from 'react-awesome-reveal';
 import "react-circular-progressbar/dist/styles.css";
-import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { toast } from 'react-toastify';
+import MainHeader from '../components/menu/MainHeader';
+import Sidebar from '../components/App/Sidebar';
 import Clock from '../components/Presale/Clock';
 import SelectCoin from '../components/Presale/SelectCoin';
 import * as selectors from '../store/selectors';
@@ -32,13 +35,16 @@ const GlobalStyles = createGlobalStyle`
     align-items: center;
     justify-content: start;
     flex-direction: column;
-    background-size: 100% !important;
-    background-position-x: center !important;
+    color: black;
+    padding-top: 100px;
     .ico-header {
       max-width: 900px;
       padding: 20px;
+      margin: auto;
       .ico-title {
-        font-size: 36px;
+        font-size: 46px;
+        font-family: "PoetsenOne";
+        text-align: center;
       }
       .ico-desc {
         font-size: 20px;
@@ -46,6 +52,9 @@ const GlobalStyles = createGlobalStyle`
     }
     @media only screen and (max-width: 1400px) {
       flex-direction: column;
+    }
+    @media only screen and (max-width: 1199px) {
+      padding-top: 0px;
     }
     @media only screen and (max-width: 768px) {
       padding: 10px;
@@ -80,7 +89,7 @@ const GlobalStyles = createGlobalStyle`
     width: 45%;
     .input-box {
       position: relative;
-      border: solid 1px white;
+      border: solid 1px #44BF01;
       border-radius: 100px;
       @media only screen and (max-width: 576px) {
         span {
@@ -122,7 +131,7 @@ const GlobalStyles = createGlobalStyle`
     padding: 10px;
     font-size: 20px;
     font-weight: bold;
-    color: white;
+    color: #44BF01;
     white-space: nowrap;
     text-overflow: ellipsis;
     display: flex;
@@ -140,9 +149,6 @@ const GlobalStyles = createGlobalStyle`
   .presale-content {
     width: 900px;
     padding: 0;
-    background: rgba(0, 0, 0, 0.2);
-    border: solid 1.5px rgba(140, 145, 255, 0.15);
-    border-radius: 20px;
     @media only screen and (max-width: 1200px) {
       width: 800px;
     }
@@ -155,7 +161,7 @@ const GlobalStyles = createGlobalStyle`
     border-radius: 12px;
     padding: 40px;
     position: relative;
-    background: transparent;
+    color: black;
     h3 {
       line-height: 2;
       margin-bottom: 0;
@@ -175,6 +181,13 @@ const GlobalStyles = createGlobalStyle`
     top: 76px;
   }
 
+  .presale-back, .buy-back {
+    border: 2px solid #96BF49;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.17);
+    border-radius: 46px;
+    padding: 20px;
+  }
+
   .end-content {
     background: #2d81e2;
     padding: 16px;
@@ -186,9 +199,7 @@ const GlobalStyles = createGlobalStyle`
   }
 
   .buy_content {
-    padding: 22px;
-    border: solid 1.5px #5a5196;
-    border-radius: 20px;
+    color: #395B2F;
   }
 
   .progress-bg {
@@ -266,6 +277,63 @@ const GlobalStyles = createGlobalStyle`
     }
   }
 `;
+
+
+function CapBackGradientSVG() {
+  const gradientTransform = `rotate(0)`;
+  return (
+    <svg style={{ height: 0 }}>
+      <defs>
+        <linearGradient id={"capBack"} gradientTransform={gradientTransform}>
+          <stop offset="0%" stopColor="rgba(236, 0, 140, 0.5)" />
+          <stop offset="90%" stopColor="rgba(252, 103, 103, 0)" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
+function CapGradientSVG() {
+  const gradientTransform = `rotate(0)`;
+  return (
+    <svg style={{ height: 0 }}>
+      <defs>
+        <linearGradient id={"cap"} gradientTransform={gradientTransform}>
+          <stop offset="0%" stopColor="#EC008C" />
+          <stop offset="100%" stopColor="#FC6767" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
+function AmountBackGradientSVG() {
+  const gradientTransform = `rotate(0)`;
+  return (
+    <svg style={{ height: 0 }}>
+      <defs>
+        <linearGradient id={"amountBack"} gradientTransform={gradientTransform}>
+          <stop offset="0%" stopColor="rgba(155, 198, 182, 0)" />
+          <stop offset="100%" stopColor="rgba(255, 247, 48, 0.5)" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
+function AmountGradientSVG() {
+  const gradientTransform = `rotate(0)`;
+  return (
+    <svg style={{ height: 0 }}>
+      <defs>
+        <linearGradient id={"amount"} gradientTransform={gradientTransform}>
+          <stop offset="0%" stopColor="#90B579" />
+          <stop offset="80%" stopColor="#11861C" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
 
 const MagicICO = (props) => {
   const LAUNCH_DATE = 1651795235;
@@ -389,7 +457,7 @@ const MagicICO = (props) => {
         }
       }
     }
-    
+
     if (start_time > 0 && start_time * 1000 > getUTCNow()) {
       setStartPresale(false);
     } else if (start_time > 0 && end_time > 0 && start_time * 1000 < getUTCNow() && end_time * 1000 > getUTCNow()) {
@@ -408,7 +476,7 @@ const MagicICO = (props) => {
     }
     setLoading(false);
   }, [web3, max_token_amount, wallet]);
-  
+
   const handleSelectCoin = async (value) => {
     setCoinType(value);
 
@@ -463,7 +531,7 @@ const MagicICO = (props) => {
     }
 
     if ((coinType === 0 && Number(balance.avaxBalance) < Number(tokenAmountA)) || (coinType === 1 && Number(balance.usdcBalance) < Number(tokenAmountA))) {
-      toast.error("You have insufficient amount to buy $MGV.");
+      toast.error("You have insufficient amount to buy BONSAI.");
       return false;
     }
     if (Number(startTime) * 1000 > getUTCNow()) {
@@ -506,7 +574,7 @@ const MagicICO = (props) => {
         Swal.fire({
           icon: 'success',
           title: ' Success',
-          text: 'You have bought $MGV for presale successfully.'
+          text: 'You have bought BONSAI for presale successfully.'
         });
       } else {
         toast.error("Transaction has been failed. " + result.error);
@@ -564,7 +632,7 @@ const MagicICO = (props) => {
 
   const addTokenCallback = useCallback(async () => {
     const tokenAddress = config.MagicAddress;
-    const tokenSymbol = '$MGV';
+    const tokenSymbol = 'BONSAI';
     const tokenDecimals = 18;
     const tokenImage = `https://raw.githubusercontent.com/traderjoe-xyz/joe-tokenlists/main/logos/${config.MagicAddress}/logo.png`;
 
@@ -583,9 +651,9 @@ const MagicICO = (props) => {
       });
 
       if (wasAdded) {
-        console.log('Adding $MGV token');
+        console.log('Adding BONSAI token');
       } else {
-        console.log('$MGV token has been added to you wallet!')
+        console.log('BONSAI token has been added to you wallet!')
       }
     } catch (error) {
       console.log(error);
@@ -593,245 +661,162 @@ const MagicICO = (props) => {
   }, [])
 
   return (
-    <div className='page-container text-center ico-container'>
-      <GlobalStyles />
-      <div className='ico-header'>
-        <Reveal className='onStep' keyframes={fadeInUp} delay={0} duration={600} triggerOnce>
-          <p className='ico-title'>Welcome to the $MGV Presale</p>
-        </Reveal>
-        <Reveal className='onStep' keyframes={fadeInUp} delay={300} duration={600} triggerOnce>
-          <p className="ico-desc">
-            Powered by AVAX. You can participate using AVAX or USDC.
-          </p>
-        </Reveal>
-      </div>
-      {(
-        <>
-          <Reveal className='presale-content onStep' keyframes={fadeIn} delay={800} duration={800} triggerOnce>
-            <div className='presale-inner py-4'>
-              <div className="row">
-                <div className='col-md-12 align-self-center'>
-                  {(leftCap === 0 || (endTime > 0 && endTime * 1000 < getUTCNow())) && (
-                    <h3 className='fs-24 uppercase'>Presale has ended!</h3>
-                  )}
-                  {leftCap > 0 && startTime > 0 && startTime * 1000 > getUTCNow() && (
-                    <h3 className='fs-24 uppercase'>Presale will be started soon!</h3>
-                  )}
-                  {leftCap > 0 && startTime > 0 && endTime > 0 && startTime * 1000 < getUTCNow() && endTime * 1000 > getUTCNow() && (
-                    <h3 className='fs-24 uppercase'>TIME REMAINING TO PARTICIPATE IN PRESALE</h3>
-                  )}
-                </div>
-                <div className="col-md-12 align-self-center">
-                  <Clock 
-                    startTime={startLine * 1000} 
-                    deadline={deadLine * 1000} 
-                    startPresale={startPresale}
-                    setEnded={(value) => setEnded(value)} 
-                  />
-                </div>
-                <div className="flex justify-content-between mt-3">
-                  <div className='flex flex-column flex-md-row gap-2 '>
-                    <span className="fs-sm-14">Start Time: </span>
-                    <span className='fs-sm-14'>{startTime === 0 ? <LoadingSkeleton /> : getUTCDate(startTime)}</span>
+    <>
+      <MainHeader showMenu={false} />
+      <div className='container text-center ico-container relative'>
+        <Sidebar />
+        <GlobalStyles />
+        <div className='ico-header'>
+          <Reveal className='onStep' keyframes={fadeInUp} delay={0} duration={600} triggerOnce>
+            <p className='ico-title'>WELCOME TO OUR<br />PRESALE</p>
+          </Reveal>
+        </div>
+        {(
+          <>
+            <Reveal className='presale-content onStep' keyframes={fadeIn} delay={800} duration={800} triggerOnce>
+              <div className='presale-inner py-4'>
+                <div className="row text-center">
+                  <div className='col-md-12 align-self-center'>
+                    {(leftCap === 0 || (endTime > 0 && endTime * 1000 < getUTCNow())) && (
+                      <h3 className='fs-24 uppercase color'>Presale has ended!</h3>
+                    )}
+                    {leftCap > 0 && startTime > 0 && startTime * 1000 > getUTCNow() && (
+                      <h3 className='fs-24 uppercase color'>Presale will be started soon!</h3>
+                    )}
+                    {leftCap > 0 && startTime > 0 && endTime > 0 && startTime * 1000 < getUTCNow() && endTime * 1000 > getUTCNow() && (
+                      <h3 className='fs-24 uppercase color'>TIME REMAINING TO PARTICIPATE IN PRESALE</h3>
+                    )}
                   </div>
-                  <div className='flex flex-column flex-md-row gap-2'>
-                    <span className='fs-sm-14'>End Time: </span>
-                    <span className='fs-sm-14'>{endTime === 0 ? <LoadingSkeleton /> : getUTCDate(endTime)}</span>
+                  <div className="col-md-12 align-self-center">
+                    <Clock
+                      startTime={startLine * 1000}
+                      deadline={deadLine * 1000}
+                      startPresale={startPresale}
+                      setEnded={(value) => setEnded(value)}
+                    />
                   </div>
                 </div>
               </div>
-            </div>
-          </Reveal>
-          <Reveal className='presale-content main mt-3 onStep' keyframes={fadeIn} delay={800} duration={800} triggerOnce>
-            <div className='presale-inner py-4'>
-              <p className="ico-desc fs-20 fs-sm-16">
-                With a presale price of 0.03 USDC.<br />
-                Our minimum limit will be $200 USDC and a max of $3,000 USDC.<br />
-                See our Whitepaper for further details.
-              </p>
-              <div className="row justify-center">
-                <div className="col-md-12 mt-1">
-                  <div className="amount_bar px-3">
-                    <div className="loading-bar my-3 position-relative">
-                      <div className="progres-area pt-5 pb-2">
-                        <ul className="progress-top">
-                          <li></li>
-                          <li className="pre-sale">25%</li>
-                          <li>50%</li>
-                          <li className="bonus">75%</li>
-                          <li></li>
-                        </ul>
-                        <ul className="progress-bars">
-                          <li></li>
-                          <li>|</li>
-                          <li>|</li>
-                          <li>|</li>
-                          <li></li>
-                        </ul>
-                        <div className="progress">
-                          <div className="progress-bar progress-bar-custom" role="progressbar" style={{ width: `${numberWithCommas(amountPercent, 2)}%` }} aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        <div className='progress-amount'>
-                          <span>{numberWithCommas(amountPercent, 1)}%</span>
-                        </div>
-                        <div className="progress-bottom">
-                          <div className="progress-info">Presale Amount received</div>
-                        </div>
+            </Reveal>
+            <Reveal className='presale-content main mt-3 onStep' keyframes={fadeIn} delay={800} duration={800} triggerOnce>
+              <div className='presale-inner py-4'>
+                <div className='fs-20 fs-sm-16 color_more'>
+                  {/* <span>Presale Term - <strong>{startTime === 0 ? <LoadingSkeleton /> : getUTCDate(startTime)} ~ {endTime === 0 ? <LoadingSkeleton /> : getUTCDate(endTime)}</strong></span><br /> */}
+                  <span>Presale Term - <strong>Aug 1st, 12:00 UTC ~ Aug 3rd, 12:00 UTC</strong></span><br />
+                  {/* <span>(We reach our goal of <strong>{usdcPrice === '' ? <LoadingSkeleton /> : numberWithCommas(max_token_amount * Number(usdcPrice)) + ' BUSD'}</strong>)</span><br /> */}
+                  <span>(We reach our goal of <strong>$100,000</strong>)</span><br />
+                  {/* <span>Powered by BNB. You can participate using BNB or BUSD</span><br /> */}
+                  <span>Our minimum limit will be <strong>$2,000 </strong> and a max of <strong>$5,000 </strong>.</span><br />
+                </div>
+              </div>
+            </Reveal>
+            <Reveal className='presale-content main mt-3 onStep' keyframes={fadeIn} delay={800} duration={800} triggerOnce>
+              <div className='presale-inner'>
+                <div className="row justify-center presale-back">
+                  <div className="col-md-6 col-sm-6 mt-1">
+                    <div className="amount_bar px-3">
+                      <h3 className='color_more'>Presale Amount received</h3>
+                      <div className='progress-bg m-auto'>
+                        <AmountBackGradientSVG />
+                        <AmountGradientSVG />
+                        <CircularProgressbar
+                          value={amountPercent}
+                          text={`${numberWithCommas(amountPercent, 2)}%`}
+                          styles={buildStyles({
+                            pathColor: `url(#amount)`,
+                            textColor: '#00DB8B',
+                            strokeLinecap: "butt",
+                            trailColor: `url(#amountBack)`
+                          })}
+                        />
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="col-md-12 mt-1">
-                  <div className="amount_bar px-3">
-                    <div className="loading-bar my-3 position-relative">
-                      <div className="progres-area pt-5 pb-2">
-                        <ul className="progress-top">
-                          <li></li>
-                          <li className="pre-sale">25%</li>
-                          <li>50%</li>
-                          <li className="bonus">75%</li>
-                          <li></li>
-                        </ul>
-                        <ul className="progress-bars">
-                          <li></li>
-                          <li>|</li>
-                          <li>|</li>
-                          <li>|</li>
-                          <li></li>
-                        </ul>
-                        <div className="progress">
-                          <div className="progress-bar progress-bar-custom" role="progressbar" style={{ width: `${numberWithCommas(capPercent, 2)}%` }} aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        <div className='progress-amount'>
-                          <span>{numberWithCommas(capPercent, 1)}%</span>
-                        </div>
-                        <div className="progress-bottom">
-                          <div className="progress-info text-center">Your Hard Cap Amount</div>
-                        </div>
+                  <div className="col-md-6 col-sm-6 mt-1">
+                    <div className="amount_bar px-3">
+                      <h3 className='color_more'>Your Hard Cap Amount</h3>
+                      <div className='progress-bg m-auto'>
+                        <CapBackGradientSVG />
+                        <CapGradientSVG />
+                        <CircularProgressbar
+                          value={capPercent}
+                          text={`${numberWithCommas(capPercent, 2)}%`}
+                          styles={buildStyles({
+                            pathColor: `url(#cap)`,
+                            textColor: '#EF1485',
+                            strokeLinecap: "butt",
+                            trailColor: `url(#capBack)`
+                          })}
+                        />
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className='col-md-12 mt-3'>
-                  {isMobile ? (
+                  <div className='col-md-12 mt-3'>
+                    <p className='fs-20 mb-1 color_more'>Presale Amount received <strong className='bright-green'>$12,000</strong></p>
+                    <p className='fs-20 mb-1 color_more'>Maximum Presale Amount Allocated <strong className='bright-green'>$100,000</strong></p>
+                    <p className='fs-20 mb-1 color_more'>BONSAI Price <strong className='bright-green'>$0.001</strong></p>
+                    {/* {isMobile ? (
                     <>
-                      <p className='fs-20 fs-sm-16 mb-1'>Presale Amount received <br /><strong>{curPresale === '' ? <LoadingSkeleton /> : '$' + numberWithCommas(curPresale) + ' USDC'}</strong></p>
-                      <p className='fs-20 fs-sm-16 mb-1'>Maximum Presale Amount Allocated <br /><strong>{usdcPrice === '' ? <LoadingSkeleton /> : '$' + numberWithCommas(max_token_amount * Number(usdcPrice)) + ' USDC'}</strong></p>
-                      <p className='fs-20 fs-sm-16 mb-1'>$MGV Price <br /><strong>{usdcPrice === '' ? <LoadingSkeleton /> : '$' + numberWithCommas(Number(usdcPrice)) + ' USDC'}</strong></p>
+                      <p className='fs-20 mb-1 color_more'>Presale Amount received <br /><strong className='bright-green'>{curPresale === '' ? <LoadingSkeleton /> : '$' + numberWithCommas(curPresale) + ' BUSD'}</strong></p>
+                      <p className='fs-20 mb-1 color_more'>Maximum Presale Amount Allocated <br /><strong className='bright-green'>{usdcPrice === '' ? <LoadingSkeleton /> : '$' + numberWithCommas(max_token_amount * Number(usdcPrice)) + ' BUSD'}</strong></p>
+                      <p className='fs-20 mb-1 color_more'>BONSAI Price <br /><strong className='bright-green'>{usdcPrice === '' ? <LoadingSkeleton /> : '$' + numberWithCommas(Number(usdcPrice)) + ' BUSD'}</strong></p>
                     </>
                   ) : (
                     <>
-                      <p className='fs-20 fs-sm-16 mb-1'>Presale Amount received : <strong>{curPresale === '' ? <LoadingSkeleton /> : '$' + numberWithCommas(curPresale) + ' USDC'}</strong></p>
-                      <p className='fs-20 fs-sm-16 mb-1'>Maximum Presale Amount Allocated : <strong>{usdcPrice === '' ? <LoadingSkeleton /> : '$' + numberWithCommas(max_token_amount * Number(usdcPrice)) + ' USDC'}</strong></p>
-                      <p className='fs-20 fs-sm-16 mb-1'>$MGV Price : <strong>{usdcPrice === '' ? <LoadingSkeleton /> : '$' + numberWithCommas(Number(usdcPrice)) + ' USDC'}</strong></p>
+                      <p className='fs-20 mb-1 color_more'>Presale Amount received : <strong className='bright-green'>{curPresale === '' ? <LoadingSkeleton /> : '$' + numberWithCommas(curPresale) + ' BUSD'}</strong></p>
+                      <p className='fs-20 mb-1 color_more'>Maximum Presale Amount Allocated : <strong className='bright-green'>{usdcPrice === '' ? <LoadingSkeleton /> : '$' + numberWithCommas(max_token_amount * Number(usdcPrice)) + ' BUSD'}</strong></p>
+                      <p className='fs-20 mb-1 color_more'>BONSAI Price : <strong className='bright-green'>{usdcPrice === '' ? <LoadingSkeleton /> : '$' + numberWithCommas(Number(usdcPrice)) + ' BUSD'}</strong></p>
                     </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </Reveal>
-
-          <Reveal className='presale-content main mt-3 onStep' keyframes={fadeIn} delay={800} duration={800} triggerOnce>
-            <div className='presale-inner py-4'>
-              <div className="row justify-center">
-                {(maxTotalCap <= paidUSDC || leftCap === 0 || getUTCNow() > endTime * 1000) ? (
-                  <div className='buy_content'>
-                    <p className='fs-20 fs-sm-16 mb-1'>You have got the maximum $MGV on presale.</p>
-                    <p className='fs-20 fs-sm-16 mb-1'>Your Holdings ($MGV): {paidUSDC === '' ? <LoadingSkeleton /> : numberWithCommas(paidUSDC / Number(usdcPrice))}</p>
+                  )} */}
                   </div>
-                ) : (
-                  <div className='col-md-12 mt-3'>
-                    <div className='row'>
-                      <div className='col-md-12'>
-                        <p className='fs-20 fs-sm-16 lh-1'>Please enter the $MGV amount you'd like to purchase</p>
-                        <div className='presale-input flex'>
-                          <div className="input-token-panel">
-                            <div className='flex justify-between'>
-                              <label className="fs-20 fs-sm-16">From</label>
-                              <span className='fs-20 fs-sm-16'>Balance: {numberWithCommas(Number(fromBalance))}</span>
-                            </div>
-                            <div className="d-flex justify-content-between input-box">
-                              <input type="number" className="input-token" name="input_from" placeholder='0.0' value={tokenAmountA} onChange={handleChange}></input>
-                              <button className='btn-max swap-color' onClick={handleMax}>MAX</button>
-                              <div className="token-bg"></div>
-                              <SelectCoin className='select-coin' value={coinType} onChange={handleSelectCoin} />
-                            </div>
-                          </div>
-                          <IconButton component="span" className="btn-change mx-auto">
-                            {isMobile ? (
-                              <i className="fa-solid fa-arrow-down"></i>
-                            ) : (
-                              <i className="fa-solid fa-arrow-right"></i>
-                            )}
-                          </IconButton>
-                          <div className="input-token-panel">
-                            <div className='flex justify-between'>
-                              <label className="fs-20 fs-sm-16">To</label>
-                              <span className='fs-20 fs-sm-16'>Balance: {numberWithCommas(Number(toBalance))}</span>
-                            </div>
-                            <div className="input-box style-2">
-                              <div className='d-flex justify-content-between input-box-inner'>
-                                <p className="input-token mb-0">{numberWithCommas(pMagicAmount, 1)}&nbsp;
-                                  {coinType === 0 && (
-                                    <span>{toAvaxPrice === 0 ? '' : ' ($' + numberWithCommas(Number(toAvaxPrice), 2) + ')'}</span>
-                                  )}
-                                </p>
-                                <div className="token-bg style-2"></div>
-                                <div className='flex align-items-center gap-2' style={{ padding: '10px', zIndex: '99' }}>
-                                  <img
-                                    loading="lazy"
-                                    width="35"
-                                    height="35"
-                                    src={`/img/icons/$mgv.png`}
-                                    alt={`Coin of $MGV`}
-                                  />
-                                  <span className='fs-20'>{'$MGV'}</span>
+                </div>
+                <div className='row buy-back mt-5'>
+                  {(/*startPresale && */leftCap >= 0) && (
+                    <>
+                      <div className='col-md-12 mt-3'>
+                        <div className='buy_content'>
+                          <div className='row'>
+                            <div className='col-md-12'>
+                              <p className='fs-20'>Please enter the BNB amount you'd like to deposit</p>
+                              <div className='presale-input flex justify-center'>
+                                <div className="input-token-panel">
+                                  <div className="d-flex justify-content-between input-box">
+                                    <input type="number" className="input-token" name="input_from" placeholder='0.0' value={tokenAmountA} onChange={handleChange}></input>
+                                    <button className='btn-max swap-color' onClick={handleMax}>MAX</button>
+                                    <SelectCoin className='select-coin' value={coinType} onChange={handleSelectCoin} />
+                                  </div>
+                                  <div className='flex justify-center'>
+                                    <span className='fs-20'>Balance: {numberWithCommas(Number(fromBalance))}</span>
+                                  </div>
                                 </div>
                               </div>
+                            </div>
+                            <div className='col-md-12 mt-3'>
+                              {/* <p className='fs-20'>BONSAI remaining for your wallet limit: {maxCap === '' || usdcPrice === '' ? <LoadingSkeleton /> : numberWithCommas(maxCap / Number(usdcPrice))}
+                                {coinType === 0 ? ` (${numberWithCommas(maxAvaxCap)} BNB)` : ` ($${numberWithCommas(maxCap)} BUSD)`}</p> */}
+                              <LoadingButton
+                                onClick={handleBuy}
+                                endIcon={<></>}
+                                loading={pending}
+                                loadingPosition="end"
+                                variant="contained"
+                                className="btn-main m-auto fs-20"
+                              >
+                                DEPOSIT
+                              </LoadingButton>
                             </div>
                           </div>
                         </div>
                       </div>
-                      <div className='col-md-12 mt-3'>
-                        <p className='fs-20 fs-sm-16'>$MGV remaining for your wallet limit: {maxCap === '' || usdcPrice === '' ? <LoadingSkeleton /> : numberWithCommas(maxCap / Number(usdcPrice))}
-                          {coinType === 0 ? ` (${numberWithCommas(maxAvaxCap)} AVAX)` : ` ($${numberWithCommas(maxCap)} USDC)`}</p>
-                        <p className='fs-20 fs-sm-16'>Minimum per transaction is $200, Maximum for presale is $3,000.</p>
-                        <LoadingButton
-                          onClick={handleBuy}
-                          endIcon={<></>}
-                          loading={pending}
-                          loadingPosition="end"
-                          variant="contained"
-                          className="btn-orange style-2 m-auto fs-20"
-                          disabled={!(startTime > 0 && endTime > 0 && startTime * 1000 < getUTCNow() && endTime * 1000 > getUTCNow())}
-                        >
-                          BUY $MGV
-                        </LoadingButton>
-                      </div>
-                      <div className='flex justify-center align-items-center gap-3 mt-3 cursor-pointer' onClick={addTokenCallback}>
-                        <img src="/img/icons/metamask.png" alt="" width="30"></img>
-                        <span style={{ whiteSpace: 'nowrap' }}> Add $MGV to MetaMask</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {/* // ) : (
-                  //   <>
-                  //     <div className='col-md-12 mt-3 mb-3'>
-                  //       <p className='fs-20 mb-1'>Goal: <strong>$1,050,000</strong></p>
-                  //       <p className='fs-20 mb-1'>Limit pet Wallet: <strong>1000 $MGV</strong></p>
-                  //       <p className='fs-20 mb-1'>Starting $MGV Price: <strong>0.008 USDC</strong></p>
-                  //       <p className='fs-22 mt-3'>Sign up to be notified when the Presale goes live</p>
-                  //       <input type="email" name="email" id="email" placeholder='Your Email' className="email_input"></input>
-                  //       <button className="btn-main btn3 m-auto mt-3 fs-20">GET NOTIFIED</button>
-                  //     </div>
-                  //   </> */}
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          </Reveal>
-        </>
-      )}
-    </div >
+            </Reveal>
+          </>
+        )}
+      </div >
+    </>
   );
 };
 

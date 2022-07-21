@@ -8,8 +8,8 @@ var joerouter_abi = require("./ABI/joerouter_abi.json");
 var dashboard_abi = require("./ABI/dashboard.json");
 
 export const config = {
-    chainId: 43114, //Fuji testnet : 43113, mainnet : 43114.  bsctestnet : 97, Rikeby: 4
-    mainNetUrl: 'https://api.avax.network/ext/bc/C/rpc',
+    chainId: 56, //Fuji testnet : 43113, mainnet : 43114.  bsctestnet : 97, Rikeby: 4
+    mainNetUrl: 'https://bsc-dataseed.binance.org/',
     // mainNetUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545',
     // mainNetUrl: 'https://rinkeby.infura.io/v3/',
     pMagicAddress: '0xb181b06A1E4BFE577E5aA913530C23d35158a6eD',

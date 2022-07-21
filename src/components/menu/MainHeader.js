@@ -30,7 +30,7 @@ const NavLink = props => (
   />
 );
 
-const Header = function () {
+const Header = function ({ showMenu = false }) {
   const userWalletState = useSelector(selectors.userWallet);
   const web3 = useSelector(selectors.web3State);
   const pending = useSelector(selectors.loadingState);
@@ -86,7 +86,7 @@ const Header = function () {
   return (
     <header id="myHeader" className='navbar white'>
       <div className='container'>
-        <div className='logo px-0'>
+        <div className='logo'>
           <div className='navbar-title navbar-item'>
             <NavLink to="/">
               <h2 className="logo-icon">BONSAI COIN</h2>
@@ -95,74 +95,78 @@ const Header = function () {
         </div>
 
         <div className="d-flex justify-content-end gap-3">
-          <BreakpointProvider>
-            <Breakpoint l down>
-              <Popover
-                id={id}
-                open={open}
-                anchorEl={anchorEl}
-                onClose={handleClose}
-                disableScrollLock={true}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}>
-                <div className='navbar-item'>
-                  <NavLink to="/dashboard" onClick={handleClose}>
-                    Home
-                  </NavLink>
-                </div>
-                <div className='navbar-item'>
-                  <NavLink to="/mint" onClick={handleClose}>
-                    PRESALE
-                  </NavLink>
-                </div>
-                <div className='navbar-item'>
-                  <NavLink to="/explore" onClick={handleClose}>
-                    SWAP
-                  </NavLink>
-                </div>
-                <div className='navbar-item'>
-                  <NavLink to="/lottery" onClick={handleClose}>
-                    NFTs
-                  </NavLink>
-                </div>
-              </Popover>
-            </Breakpoint>
+          {showMenu && (
+            <>
+              <BreakpointProvider>
+                <Breakpoint l down>
+                  <Popover
+                    id={id}
+                    open={open}
+                    anchorEl={anchorEl}
+                    onClose={handleClose}
+                    disableScrollLock={true}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}>
+                    <div className='navbar-item'>
+                      <NavLink to="/" onClick={handleClose}>
+                        Home
+                      </NavLink>
+                    </div>
+                    <div className='navbar-item'>
+                      <NavLink to="/presale" onClick={handleClose}>
+                        PRESALE
+                      </NavLink>
+                    </div>
+                    <div className='navbar-item'>
+                      <NavLink to="/swap" onClick={handleClose}>
+                        SWAP
+                      </NavLink>
+                    </div>
+                    <div className='navbar-item'>
+                      <NavLink to="/" onClick={handleClose}>
+                        NFTs
+                      </NavLink>
+                    </div>
+                  </Popover>
+                </Breakpoint>
 
-            <Breakpoint xl>
-              <div className='menu'>
-                <div className='navbar-item'>
-                  <NavLink to="/dashboard">
-                    Home
-                    <span className='lines'></span>
-                  </NavLink>
-                </div>
-                <div className='navbar-item'>
-                  <NavLink to="/mint">
-                    PRESALE
-                    <span className='lines'></span>
-                  </NavLink>
-                </div>
-                <div className='navbar-item'>
-                  <NavLink to="/explore">
-                    SWAP
-                    <span className='lines'></span>
-                  </NavLink>
-                </div>
-                <div className='navbar-item'>
-                  <NavLink to="/lottery">
-                    NFTs
-                    <span className='lines'></span>
-                  </NavLink>
-                </div>
-              </div>
-            </Breakpoint>
-          </BreakpointProvider>
+                <Breakpoint xl>
+                  <div className='menu'>
+                    <div className='navbar-item'>
+                      <NavLink to="/">
+                        Home
+                        <span className='lines'></span>
+                      </NavLink>
+                    </div>
+                    <div className='navbar-item'>
+                      <NavLink to="/presale">
+                        PRESALE
+                        <span className='lines'></span>
+                      </NavLink>
+                    </div>
+                    <div className='navbar-item'>
+                      <NavLink to="/swap">
+                        SWAP
+                        <span className='lines'></span>
+                      </NavLink>
+                    </div>
+                    <div className='navbar-item'>
+                      <NavLink to="/">
+                        NFTs
+                        <span className='lines'></span>
+                      </NavLink>
+                    </div>
+                  </div>
+                </Breakpoint>
+              </BreakpointProvider>
+            </>
+          )}
 
           <div className='mainside d-flex align-items-center'>
             {web3 !== null && chainId !== '' && web3.utils.toHex(chainId) !== web3.utils.toHex(config.chainId) ? (
@@ -188,7 +192,7 @@ const Header = function () {
                       <div className="flex flex-column">
                         <div className="connect-wal flex-column">
                           <div className="flex">
-                            <span className="text-white">{userWalletState && (userWalletState.slice(0, 4) + "..." + userWalletState.slice(38))}</span>
+                            <span className="text-black">{userWalletState && (userWalletState.slice(0, 4) + "..." + userWalletState.slice(38))}</span>
                           </div>
                           <button className="btn-disconnect fs-12" onClick={onDisconnect}>Disconnect</button>
                         </div>
@@ -201,9 +205,9 @@ const Header = function () {
         </div>
 
         <button className="nav-icon" onClick={handleClick}>
-          <div className="menu-line white"></div>
-          <div className="menu-line1 white"></div>
-          <div className="menu-line2 white"></div>
+          <div className="menu-line text-black"></div>
+          <div className="menu-line1 text-black"></div>
+          <div className="menu-line2 text-black"></div>
         </button>
 
       </div>

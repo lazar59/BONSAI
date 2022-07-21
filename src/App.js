@@ -1,20 +1,14 @@
 import './App.css';
 import { useState, useEffect } from 'react';
 import { Router, Location, Redirect, useLocation } from '@reach/router';
-import { useMediaQuery } from 'react-responsive';
 import ScrollToTopBtn from './components/menu/ScrollToTop';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import Home from './routes/Home';
-import MagicICO from './routes/MagicICO';
+import Presale from './routes/Presale';
 import Swap from './routes/Swap';
 import AdminICO from './routes/Admin/AdminICO';
-
-import Sidebar from './components/App/Sidebar';
-import MainHeader from './components/menu/MainHeader';
 import { loadWeb3 } from './core/web3';
 
 export const ScrollTop = ({ children, location }) => {
@@ -36,21 +30,11 @@ const PosedRouter = ({ children }) => (
   </Location>
 );
 
-const path_list = ['', 'dashboard', 'account', 'swap', 'nft_savings', 'magic_ico', 'magic_control/admin'];
+const path_list = ['', 'dashboard', 'account', 'swap', 'presale', 'control/admin'];
 
 function App() {
-  const [isOpen, setIsOpen] = useState(false);
   const [navSelected, setNavSelected] = useState('');
-
-  const isMobile = useMediaQuery({ maxWidth: '1024px' });
   const location = useLocation();
-
-  useEffect(() => {
-    window.addEventListener('load', (event) => {
-      AOS.init();
-      AOS.refresh();
-    });
-  }, []);
 
   useEffect(() => {
     let path_name = location.pathname.replace('/', '');
@@ -68,39 +52,21 @@ function App() {
 
   return (
     <div className='app-container relative min-h-screen md:flex'>
-      {/* SIDEBAR NAV */}
-      {navSelected !== '' && (
-        <Sidebar setIsOpen={setIsOpen} isOpen={isOpen} />
-      )}
-
       {/* THIS IS OUR CONTENT PAGE */}
       <div
-        className={`flex-1 text-white min-h-screen flex-col overflow-hidden ${navSelected !== '' ? 'page-content' : ''}`}
+        className={`flex-1 text-white min-h-screen flex-col overflow-hidden ${navSelected !== '' ? '' : ''}`}
 
       >
-        {/* THIS IS OUR HEADER */}
-        {navSelected === '' && (
-          <MainHeader />
-        )}
-        <div
-          className='full-height'
-          onClick={() => {
-            if (isMobile) {
-              setIsOpen(false);
-            }
-          }}
-        >
-          <PosedRouter>
-            <ScrollTop path="/">
-              <Home exact path="/" onSelected={setNavSelected}>
-                <Redirect to="/" />
-              </Home>
-              <MagicICO path="magic_ico" />
-              <Swap path="swap" />
-              <AdminICO path="magic_control/admin" />
-            </ScrollTop>
-          </PosedRouter>
-        </div>
+        <PosedRouter>
+          <ScrollTop path="/">
+            <Home exact path="/" onSelected={setNavSelected}>
+              <Redirect to="/" />
+            </Home>
+            <Presale path="presale" />
+            <Swap path="swap" />
+            <AdminICO path="control/admin" />
+          </ScrollTop>
+        </PosedRouter>
       </div>
       <ScrollToTopBtn />
       <ToastContainer

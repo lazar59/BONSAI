@@ -34,6 +34,7 @@ const StyledButton = styled('button')(
   &::after {
     content: '▾';
     float: right;
+    color: black;
   }`,
 );
 
@@ -44,9 +45,9 @@ const StyledListbox = styled('ul')(
   box-sizing: border-box;
   padding: 5px;
   margin: 0px 0;
-  background: rgb(21,27,52);
+  background: rgba(158, 169, 85, 0.4);
   border-radius: 0.75em;
-  color: white;
+  color: black;
   overflow: auto;
   outline: 0px;
   `,
@@ -54,7 +55,7 @@ const StyledListbox = styled('ul')(
 
 const StyledOption = styled(OptionUnstyled)(
   ({ theme }) => `
-  background: rgb(21,27,52);
+  background: rgba(158, 169, 85, 0.4);
   list-style: none;
   padding: 8px;
   border-radius: 0.45em;
@@ -63,7 +64,7 @@ const StyledOption = styled(OptionUnstyled)(
   flex-direction: row;
   align-items: center;
   &:hover {
-    background: rgb(8, 15, 42);
+    background: rgba(158, 169, 85, 0.4);
   }
   &:last-of-type {
     border-bottom: none;
@@ -102,8 +103,8 @@ CustomSelect.propTypes = {
 };
 
 const def_coins = [
-  { code: 0, label: 'AVAX' },
-  { code: 1, label: 'USDC' }
+  { code: 0, label: 'BNB' },
+  { code: 1, label: 'BUSD' }
 ];
 
 export default function UnstyledSelectRichOptions({ value, coins = def_coins, onChange, disabled }) {
@@ -117,7 +118,7 @@ export default function UnstyledSelectRichOptions({ value, coins = def_coins, on
             src={api.rootUrl + `/img/icons/${c.label.toLowerCase()}.png`}
             alt={`Coin of ${c.label}`}
           />
-          <span>{c.label}</span>
+          <span className='text-black'>{c.label}</span>
         </StyledOption>
       ))}
     </CustomSelect>
