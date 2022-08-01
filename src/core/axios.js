@@ -5,17 +5,38 @@ import api from './api';
 export const Axios = axios.create();
 export const Canceler = axios.CancelToken.source();
 
-export const getMagicPrice = async () => {
+export const getBNBPrice = async () => {
   try {
-    const { data } = await Axios.get(`https://deep-index.moralis.io/api/v2/erc20/${config.MagicAddress}/price?chain=avalanche`, {
+    const { data } = await Axios.get('https://api.coingecko.com/api/v3/simple/price/?ids=binancecoin&&vs_currencies=USD', {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      }
+    });
+    return {
+      success: true,
+      price: data.binancecoin.usd
+    }
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+    }
+  }
+}
+
+export const getBONSAIPrice = async () => {
+  try {
+    const { data } = await Axios.get(`https://deep-index.moralis.io/api/v2/erc20/${config.BONSAIAddress}/price?chain=bsc`, {
       headers: {
         'X-API-Key': 'jgbmIBfvp1EWtYWoCLmbzkvUXozuzYRailhd420Wo9xSCHk1dKRqwIMpvFGYMWXm'
       }
     });
-    console.log('[Magic Price] = ', Number(data.usdPrice) * 10 ** 8)
+    console.log('[BONSAI Price] = ', Number(data.usdPrice) * 10 ** 8)
     return {
       success: true,
-      magicPrice: data.usdPrice
+      BONSAIPrice: data.usdPrice
     }
   } catch (error) {
     console.log(error);
@@ -27,7 +48,7 @@ export const getMagicPrice = async () => {
 
 export const getTokenHolders = async () => {
   try {
-    const { data } = await Axios.get(`https://api.covalenthq.com/v1/43114/tokens/${config.MagicAddress}/token_holders/?format=JSON&page-number=0&page-size=999999999&key=${api.cova_api_key}`);
+    const { data } = await Axios.get(`https://api.covalenthq.com/v1/${config.chainId}/tokens/${config.BONSAIAddress}/token_holders/?format=JSON&page-number=0&page-size=999999999&key=${api.cova_api_key}`);
     if (data.error === false) {
       return {
         success: true,

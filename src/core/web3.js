@@ -6,22 +6,13 @@ import { config } from "./config";
 import store from "../store";
 import { setChainID, setWalletAddr, setBalance, setWeb3 } from '../store/actions';
 import { parseErrorMsg } from '../components/utils';
-const PresaleFactoryABI = config.PresaleFactoryAbi;
-const PresaleFactoryAddress = config.PresaleFactoryAddress;
-const MagicABI = config.MagicAbi;
-const MagicAddress = config.MagicAddress;
-const AvaxAddress = config.AvaxAddress;
-const USDCABI = config.USDCAbi;
-const USDCAddress = config.USDCAddress;
-const JOEABI = config.JoeRouterAbi;
-const JOEAddress = config.JoeRouterAddress;
-const AvaxMagicPairAddress = config.avaxMagicPair;
-const AvaxMagicPairABI = config.avaxMagicAbi;
+const FNFTFactoryABI = config.FNFTFactoryABI;
+const FNFTFactory = config.FNFTFactory;
 
 let web3Modal;
 if (typeof window !== "undefined") {
   web3Modal = new Web3Modal({
-    network: "mainnet", // optional
+    network: "testnet", // optional
     cacheProvider: true,
     providerOptions: {
       walletconnect: {
@@ -29,7 +20,8 @@ if (typeof window !== "undefined") {
         options: {
           infuraId: config.INFURA_ID, // required
           rpc: {
-            43114: config.mainNetUrl,
+            // 56: config.mainNetUrl,
+            97: config.testNetUrl,
           },
         },
       },
@@ -50,7 +42,7 @@ export const loadWeb3 = async () => {
     //   hover: "rgb(16, 26, 32)"
     // });
     // await web3Modal.clearCachedProvider();
-    let web3 = new Web3(config.mainNetUrl);
+    let web3 = new Web3(config.testNetUrl);
     store.dispatch(setWeb3(web3));
 
     provider = await web3Modal.connect();
@@ -94,9 +86,9 @@ export const disconnect = async () => {
   store.dispatch(setChainID(''));
   store.dispatch(setWalletAddr(''));
   store.dispatch(setBalance({
-    avaxBalance: '',
+    BNBBalance: '',
     usdcBalance: '',
-    magicBalance: ''
+    BONSAIBalance: ''
   }));
 }
 
@@ -138,8 +130,8 @@ const changeNetwork = async () => {
           params: [
             {
               chainId: web3.utils.toHex(config.chainId),
-              chainName: 'Avalanche',
-              rpcUrls: [config.mainNetUrl] /* ... */,
+              chainName: 'BSC',
+              rpcUrls: [config.testNetUrl] /* ... */,
             },
           ],
         });
@@ -191,27 +183,21 @@ export const getBalanceOfAccount = async () => {
   try {
     const accounts = await web3.eth.getAccounts();
     if (accounts.length === 0) return { success: false }
-    let avaxBalance = await web3.eth.getBalance(accounts[0]);
-    avaxBalance = web3.utils.fromWei(avaxBalance);
+    let BNBBalance = await web3.eth.getBalance(accounts[0]);
+    BNBBalance = web3.utils.fromWei(BNBBalance);
 
-    const UsdcContract = new web3.eth.Contract(USDCABI, USDCAddress);
-    let usdcBalance = await UsdcContract.methods.balanceOf(accounts[0]).call();
-    usdcBalance = web3.utils.fromWei(usdcBalance, 'mwei');
-
-    const MagicContract = new web3.eth.Contract(MagicABI, MagicAddress);
-    let magicBalance = await MagicContract.methods.balanceOf(accounts[0]).call();
-    magicBalance = web3.utils.fromWei(magicBalance);
+    // const BONSAIContract = new web3.eth.Contract(BONSAIABI, BONSAIAddress);
+    let BONSAIBalance = 0; //await BONSAIContract.methods.balanceOf(accounts[0]).call();
+    // BONSAIBalance = web3.utils.fromWei(BONSAIBalance);
 
     store.dispatch(setBalance({
-      avaxBalance,
-      usdcBalance,
-      magicBalance
+      BNBBalance,
+      BONSAIBalance
     }));
     return {
       success: true,
-      avaxBalance,
-      usdcBalance,
-      magicBalance
+      BNBBalance,
+      BONSAIBalance
     }
   } catch (error) {
     console.log('[Get Balance] = ', error);
@@ -232,12 +218,35 @@ export const compareWalllet = (first, second) => {
   return false;
 }
 
+export const depositBNB = async(amount) => {
+  const web3 = store.getState().auth.web3;
+  if (!web3) return { success: false }
+  try {
+    const accounts = await web3.eth.getAccounts();
+    if (accounts.length === 0) return { success: false }
+    const PresaleContract = new web3.eth.Contract(FNFTFactoryABI, FNFTFactory);
+    const bnbAmount = web3.utils.toWei(amount.toString());
+    const estimate = PresaleContract.methods.depositBNB();
+    await estimate.estimateGas({ from: accounts[0], value: bnbAmount });
+    await estimate.send({ from: accounts[0], value: bnbAmount });
+    return {
+      success: true
+    }
+  } catch (error) {
+    console.log('[Deposit Error] = ', error);
+    return {
+      success: false,
+      error: parseErrorMsg(error.message)
+    }
+  }
+}
+
+
 export const getTotalPresaleAmount = async () => {
   const web3 = store.getState().auth.web3;
   if (!web3) return { success: false }
   try {
-    const MagicContract = new web3.eth.Contract(MagicABI, MagicAddress);
-    let presaleAmount = await MagicContract.methods.balanceOf(PresaleFactoryAddress).call();
+    let presaleAmount = await web3.eth.getBalance(FNFTFactory);
     presaleAmount = web3.utils.fromWei(presaleAmount);
     return {
       success: true,
@@ -252,205 +261,19 @@ export const getTotalPresaleAmount = async () => {
   }
 }
 
-export const getMaxPresaleCap = async () => {
+export const getInitialBNB = async () => {
   const web3 = store.getState().auth.web3;
   if (!web3) return { success: false }
   try {
-    const PresaleContract = new web3.eth.Contract(PresaleFactoryABI, PresaleFactoryAddress);
-    let maxCap = await PresaleContract.methods.maxCapUSDC().call();
-    maxCap = web3.utils.fromWei(maxCap, 'mwei');
-    return {
-      success: true,
-      maxCap
-    }
-  } catch (error) {
-    console.log('[MAX Error] = ', error);
-    return {
-      success: false,
-      result: "Something went wrong "
-    }
-  }
-}
-
-export const getMinPresaleCap = async () => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const PresaleContract = new web3.eth.Contract(PresaleFactoryABI, PresaleFactoryAddress);
-    let minCap = await PresaleContract.methods.minCapUSDC().call();
-    minCap = web3.utils.fromWei(minCap, 'mwei');
+    const PresaleContract = new web3.eth.Contract(FNFTFactoryABI, FNFTFactory);
+    let minCap = await PresaleContract.methods._initialBNB().call();
+    minCap = web3.utils.fromWei(minCap.toString());
     return {
       success: true,
       minCap
     }
   } catch (error) {
-    console.log('[MIN Error] = ', error);
-    return {
-      success: false,
-      result: "Something went wrong "
-    }
-  }
-}
-
-export const getStartPresaleTime = async () => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const PresaleContract = new web3.eth.Contract(PresaleFactoryABI, PresaleFactoryAddress);
-    let start_time = await PresaleContract.methods.start_time().call();
-    return {
-      success: true,
-      start_time
-    }
-  } catch (error) {
-    console.log('[START Error] = ', error);
-    return {
-      success: false,
-      result: "Something went wrong "
-    }
-  }
-}
-
-export const getEndPresaleTime = async () => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const PresaleContract = new web3.eth.Contract(PresaleFactoryABI, PresaleFactoryAddress);
-    let end_time = await PresaleContract.methods.end_time().call();
-    return {
-      success: true,
-      end_time
-    }
-  } catch (error) {
-    console.log('[END Error] = ', error);
-    return {
-      success: false,
-      result: "Something went wrong "
-    }
-  }
-}
-
-export const getpTokenPriceForUSDC = async () => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const PresaleContract = new web3.eth.Contract(PresaleFactoryABI, PresaleFactoryAddress);
-    let usdcPrice = await PresaleContract.methods.pTokenPrice_USDC().call();
-    usdcPrice = web3.utils.fromWei(usdcPrice, 'mwei');
-    return {
-      success: true,
-      usdcPrice
-    }
-  } catch (error) {
-    console.log('[USDC Error] = ', error);
-    return {
-      success: false,
-      result: "Something went wrong "
-    }
-  }
-}
-
-export const getAVAXForUSDC = async (amountOut) => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const path = [];
-    path.push(AvaxAddress);
-    path.push(USDCAddress);
-    const from_decimal = 'mwei';
-    const to_decimal = 'ether';
-    const JoeContract = new web3.eth.Contract(JOEABI, JOEAddress);
-    let amountIn = await JoeContract.methods.getAmountsIn(web3.utils.toWei(amountOut.toString(), from_decimal), path).call();
-    return {
-      success: true,
-      value: web3.utils.fromWei(amountIn[0], to_decimal)
-    }
-  } catch (error) {
-    console.log('[AVAX For USDC Error] = ', error);
-    return {
-      success: false,
-      result: "Something went wrong "
-    }
-  }
-}
-
-export const getUSDCForAVAX = async (amountIn) => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const path = [];
-    path.push(AvaxAddress);
-    path.push(USDCAddress);
-    const from_decimal = 'ether';
-    const to_decimal = 'mwei';
-    const JoeContract = new web3.eth.Contract(JOEABI, JOEAddress);
-    let amountOut = await JoeContract.methods.getAmountsOut(web3.utils.toWei(amountIn.toString(), from_decimal), path).call();
-    return {
-      success: true,
-      value: web3.utils.fromWei(amountOut[amountOut.length - 1], to_decimal)
-    }
-  } catch (error) {
-    console.log('[USDC For AVAX Error] = ', error);
-    return {
-      success: false,
-      result: "Something went wrong "
-    }
-  }
-}
-
-export const getUserPaidUSDC = async () => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const accounts = await web3.eth.getAccounts();
-    if (accounts.length === 0) return { success: false }
-    const PresaleContract = new web3.eth.Contract(PresaleFactoryABI, PresaleFactoryAddress);
-    let paidUSDC = await PresaleContract.methods.getUserPaidUSDC().call({ from: accounts[0] });
-    paidUSDC = web3.utils.fromWei(paidUSDC, 'mwei');
-    return {
-      success: true,
-      paidUSDC
-    }
-  } catch (error) {
-    console.log('[USDC Error] = ', error);
-    return {
-      success: false,
-      result: "Something went wrong "
-    }
-  }
-}
-
-export const buy_pToken = async (coinAmount, tokenAmount, coinType) => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const accounts = await web3.eth.getAccounts();
-    if (accounts.length === 0) return { success: false }
-    const PresaleContract = new web3.eth.Contract(PresaleFactoryABI, PresaleFactoryAddress);
-    let decimal = 'ether', nDecimal = 18;
-    if (coinType === 1) {
-      decimal = 'mwei';
-      nDecimal = 6;
-    }
-    coinAmount = Math.floor(coinAmount * 10 ** nDecimal) / 10 ** nDecimal;
-    coinAmount = web3.utils.toWei(coinAmount.toString(), decimal);
-    tokenAmount = web3.utils.toWei(tokenAmount.toString());
-    if (coinType === 0) {
-      const buyTokens = PresaleContract.methods.buyTokensByAVAX();
-      await buyTokens.estimateGas({ from: accounts[0], value: coinAmount });
-      await PresaleContract.methods.buyTokensByAVAX().send({ from: accounts[0], value: coinAmount });
-    } else {
-      const UsdcContract = new web3.eth.Contract(USDCABI, USDCAddress);
-      await UsdcContract.methods.approve(PresaleFactoryAddress, coinAmount).send({ from: accounts[0] });
-      const buyTokens = PresaleContract.methods.buyTokensByUSDC(coinAmount);
-      await buyTokens.estimateGas({ from: accounts[0] });
-      await PresaleContract.methods.buyTokensByUSDC(coinAmount).send({ from: accounts[0] });
-    }
-    return {
-      success: true
-    }
-  } catch (error) {
-    console.log('[BUY Error] = ', error);
+    console.log('[BNB Error] = ', error);
     return {
       success: false,
       error: parseErrorMsg(error.message)
@@ -458,288 +281,24 @@ export const buy_pToken = async (coinAmount, tokenAmount, coinType) => {
   }
 }
 
-export const setPresaleStartTime = async (_time) => {
+export const getFounderInfo = async () => {
   const web3 = store.getState().auth.web3;
   if (!web3) return { success: false }
   try {
     const accounts = await web3.eth.getAccounts();
     if (accounts.length === 0) return { success: false }
-    const PresaleContract = new web3.eth.Contract(PresaleFactoryABI, PresaleFactoryAddress);
-    const startTime = PresaleContract.methods.setStartTime(_time);
-    await startTime.estimateGas({ from: accounts[0] });
-    await PresaleContract.methods.setStartTime(_time).send({ from: accounts[0] });
-    return {
-      success: true
-    }
-  } catch (error) {
-    return {
-      success: false,
-      error: parseErrorMsg(error.message)
-    }
-  }
-}
-
-export const setPresaleEndTime = async (_time) => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const accounts = await web3.eth.getAccounts();
-    if (accounts.length === 0) return { success: false }
-    const PresaleContract = new web3.eth.Contract(PresaleFactoryABI, PresaleFactoryAddress);
-    const estimate = PresaleContract.methods.setEndTime(_time);
-    await estimate.estimateGas({ from: accounts[0] });
-    await PresaleContract.methods.setEndTime(_time).send({ from: accounts[0] });
-    return {
-      success: true
-    }
-  } catch (error) {
-    return {
-      success: false,
-      error: parseErrorMsg(error.message)
-    }
-  }
-}
-
-export const setFeesOnNormalTransfer = async (enabled) => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const accounts = await web3.eth.getAccounts();
-    if (accounts.length === 0) return { success: false }
-    const MagicContract = new web3.eth.Contract(MagicABI, MagicAddress);
-    const estimate = MagicContract.methods.setFeesOnNormalTransfers(enabled);
-    await estimate.estimateGas({ from: accounts[0] });
-    console.log(enabled)
-    await MagicContract.methods.setFeesOnNormalTransfers(enabled).send({ from: accounts[0] });
-    return {
-      success: true
-    }
-  } catch (error) {
-    return {
-      success: false,
-      error: parseErrorMsg(error.message)
-    }
-  }
-}
-
-export const setInitialDistributionFinished = async (enalbed) => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const accounts = await web3.eth.getAccounts();
-    if (accounts.length === 0) return { success: false }
-    const MagicContract = new web3.eth.Contract(MagicABI, MagicAddress);
-    const estimate = MagicContract.methods.setInitialDistributionFinished(enalbed);
-    await estimate.estimateGas({ from: accounts[0] });
-    await MagicContract.methods.setInitialDistributionFinished(enalbed).send({ from: accounts[0] });
-    return {
-      success: true
-    }
-  } catch (error) {
-    return {
-      success: false,
-      error: parseErrorMsg(error.message)
-    }
-  }
-}
-
-export const setMaxCap = async (_maxCap) => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const accounts = await web3.eth.getAccounts();
-    if (accounts.length === 0) return { success: false }
-    const PresaleContract = new web3.eth.Contract(PresaleFactoryABI, PresaleFactoryAddress);
-    const maxCap = web3.utils.toWei(_maxCap.toString(), 'mwei');
-    console.log('[Max Cap]', maxCap);
-    const estimate = PresaleContract.methods.setMaxCapUSDC(maxCap);
-    await estimate.estimateGas({ from: accounts[0] });
-    await PresaleContract.methods.setMaxCapUSDC(maxCap).send({ from: accounts[0] });
-    return {
-      success: true
-    }
-  } catch (error) {
-    return {
-      success: false,
-      error: parseErrorMsg(error.message)
-    }
-  }
-}
-
-export const setMinCap = async (_minCap) => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const accounts = await web3.eth.getAccounts();
-    if (accounts.length === 0) return { success: false }
-    const PresaleContract = new web3.eth.Contract(PresaleFactoryABI, PresaleFactoryAddress);
-    const minCap = web3.utils.toWei(_minCap.toString(), 'mwei');
-    console.log('[Min Cap]', minCap);
-    const estimate = PresaleContract.methods.setMinCapUSDC(minCap);
-    await estimate.estimateGas({ from: accounts[0] });
-    await PresaleContract.methods.setMinCapUSDC(minCap).send({ from: accounts[0] });
-    return {
-      success: true
-    }
-  } catch (error) {
-    return {
-      success: false,
-      error: parseErrorMsg(error.message)
-    }
-  }
-}
-
-export const setFeeReceivers = async (data) => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const accounts = await web3.eth.getAccounts();
-    if (accounts.length === 0) return { success: false }
-    const MagicContract = new web3.eth.Contract(MagicABI, MagicAddress);
-    const estimate = MagicContract.methods.setFeeReceivers(data.liquidity_receiver, data.treasury_receiver, data.risk_free_value_receiver, data.operation_receiver, data.x_magic_receiver, data.future_ecosystem_receiver, data.burn_receiver);
-    await estimate.estimateGas({ from: accounts[0] });
-    await MagicContract.methods.setFeeReceivers(data.liquidity_receiver, data.treasury_receiver, data.risk_free_value_receiver, data.operation_receiver, data.x_magic_receiver, data.future_ecosystem_receiver, data.burn_receiver).send({ from: accounts[0] });
-    return {
-      success: true
-    }
-  } catch (error) {
-    console.log(error)
-    return {
-      success: false,
-      error: parseErrorMsg(error.message)
-    }
-  }
-}
-
-
-export const setFees = async (data) => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const accounts = await web3.eth.getAccounts();
-    if (accounts.length === 0) return { success: false }
-    const MagicContract = new web3.eth.Contract(MagicABI, MagicAddress);
-    const estimate = MagicContract.methods.setFees(data.fee_kind, data.total, data.liquidity_fee, data.risk_free_value_fee, data.treasury_fee, data.fee_fee, data.operation_fee, data.x_magic_fee, data.burn_fee);
-    await estimate.estimateGas({ from: accounts[0] });
-    await MagicContract.methods.setFees(data.fee_kind, data.total, data.liquidity_fee, data.risk_free_value_fee, data.treasury_fee, data.fee_fee, data.operation_fee, data.x_magic_fee, data.burn_fee).send({ from: accounts[0] });
-    return {
-      success: true
-    }
-  } catch (error) {
-    console.log(error)
-    return {
-      success: false,
-      error: parseErrorMsg(error.message)
-    }
-  }
-}
-
-export const getMagicPriceInWeb3 = async () => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    // const path = [];
-    // path.push(MagicAddress);
-    // path.push(AvaxAddress);
-    // path.push(USDCAddress);
-    // const from_decimal = 'ether';
-    // const to_decimal = 'mwei';
-    // const JoeContract = new web3.eth.Contract(JOEABI, JOEAddress);
-    // let amountOut = await JoeContract.methods.getAmountsOut(web3.utils.toWei('1', from_decimal), path).call();
+    const PresaleContract = new web3.eth.Contract(FNFTFactoryABI, FNFTFactory);
+    const info = await PresaleContract.methods.getFounderInfo(accounts[0]).call();
     return {
       success: true,
-      magicPrice: 0.03 // web3.utils.fromWei(amountOut[amountOut.length - 1], to_decimal)
+      amountBNB: web3.utils.fromWei(info.amountBNB),
+      numberOfFNFT: Number(info.numberOfFNFT)
     }
   } catch (error) {
-    console.log('[USDC Error] = ', error);
+    console.log('[Deposit Error] = ', error);
     return {
       success: false,
-      result: "Something went wrong "
-    }
-  }
-}
-
-export const getRebaseFrequency = async () => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const MagicContract = new web3.eth.Contract(MagicABI, MagicAddress);
-    let rebaseFrequency = await MagicContract.methods.rebaseFrequency().call();
-    return {
-      success: true,
-      rebaseFrequency
-    }
-  } catch (error) {
-    return {
-      success: false,
-      result: "Something went wrong "
-    }
-  }
-}
-
-export const getNextRebase = async () => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const MagicContract = new web3.eth.Contract(MagicABI, MagicAddress);
-    let nextRebase = await MagicContract.methods.nextRebase().call();
-    return {
-      success: true,
-      nextRebase
-    }
-  } catch (error) {
-    console.log('[Next] = ', error);
-    return {
-      success: false,
-      result: "Something went wrong "
-    }
-  }
-}
-
-export const getMarketCap = async (magicPrice) => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const MagicContract = new web3.eth.Contract(MagicABI, MagicAddress);
-    let supply = await MagicContract.methods.getCirculatingSupply().call();
-    supply = web3.utils.fromWei(supply);
-    const marketCap = supply * magicPrice;
-    return {
-      success: true,
-      marketCap
-    }
-  } catch (error) {
-    console.log('[MarketCap] = ', error);
-    return {
-      success: false,
-      result: "Something went wrong "
-    }
-  }
-}
-
-export const getTotalEarned = async () => {
-  const web3 = store.getState().auth.web3;
-  if (!web3) return { success: false }
-  try {
-    const accounts = await web3.eth.getAccounts();
-    if (accounts.length === 0) return { success: false }
-    const MagicContract = new web3.eth.Contract(MagicABI, MagicAddress);
-    let initialBalance = await MagicContract.methods.initialBalanceOf(accounts[0]).call();
-    initialBalance = web3.utils.fromWei(initialBalance);
-    let totalBalance = await MagicContract.methods.balanceOf(accounts[0]).call();
-    totalBalance = web3.utils.fromWei(totalBalance);
-    const total_earned = 0; // Number(totalBalance) - Number(initialBalance);
-    const earned_rate = 0; // Number(initialBalance) <= 0 ? 0 : total_earned * 100 / Number(initialBalance);
-    return {
-      success: true,
-      total_earned,
-      earned_rate
-    }
-  } catch (error) {
-    console.log('[Total Earned] = ', error);
-    return {
-      success: false,
-      result: "Something went wrong "
+      error: parseErrorMsg(error.message)
     }
   }
 }

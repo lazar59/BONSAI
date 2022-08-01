@@ -6,9 +6,8 @@ export const defaultState = {
   web3: null,
   wallet: '',
   balance: {
-    avaxBalance: '',
-    usdcBalance: '',
-    magicBalance: ''
+    BNBBalance: '',
+    BONSAIBalance: ''
   },
   chainID: '',
   loading: false

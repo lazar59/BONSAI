@@ -1,17 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link } from '@reach/router';
 import { createGlobalStyle } from 'styled-components';
-import Reveal, { Zoom } from 'react-awesome-reveal';
-import { useSelector } from 'react-redux';
-import ModalVideo from 'react-modal-video'
+import Reveal from 'react-awesome-reveal';
 import { fadeInUp } from '../utils';
-// import Particles from '../components/Particles';
 import { FlipDate } from './FlipDate';
-import * as selectors from '../../store/selectors';
-import { getStartPresaleTime, getEndPresaleTime } from '../../core/web3';
 import { getUTCNow, getUTCDateTime } from '../utils';
-
-import '../../../node_modules/react-modal-video/scss/modal-video.scss';
+import { def_config } from '../../core/config';
 
 const GlobalStyles = createGlobalStyle`
   .header-logo {
@@ -133,36 +126,17 @@ const GlobalStyles = createGlobalStyle`
 `;
 
 const Slidermain = () => {
-  const web3 = useSelector(selectors.web3State);
-  const [startTime, setStartTime] = useState(0);
-  const [endTime, setEndTime] = useState(0);
   const [deadLine, setDeadLine] = useState(0);
-  const [isOpen, setOpen] = useState(false)
+  const START_DATE = def_config.START_TIME * 1000;
+  const END_DATE = (def_config.START_TIME + def_config.PRESALE_PERIOD * 3600 * 24) * 1000;
 
   const initialize = useCallback(async () => {
-    if (!web3) {
-      return;
-    }
-    let start_time = 0;
-    let result = await getStartPresaleTime();
-    if (result.success) {
-      start_time = Number(result.start_time) * 1000;
-      setStartTime(start_time);
-      if (start_time > getUTCNow()) {
-        setDeadLine(start_time);
-      }
+    if (START_DATE > getUTCNow()) {
+      setDeadLine(START_DATE);
     } else {
-      return;
+      setDeadLine(END_DATE);
     }
-    result = await getEndPresaleTime();
-    if (result.success) {
-      const time = Number(result.end_time) * 1000;
-      setEndTime(Number(time));
-      if (time > getUTCNow() && start_time < getUTCNow()) {
-        setDeadLine(time);
-      }
-    }
-  }, [web3]);
+  }, [END_DATE, START_DATE]);
 
   useEffect(() => {
     initialize();
@@ -185,14 +159,14 @@ const Slidermain = () => {
               {deadLine > 0 && (
                 <Reveal keyframes={fadeInUp} className='onStep' delay={600} duration={1000} triggerOnce>
                   <>
-                    {startTime > 0 && startTime > getUTCNow() && (
-                      <p className='fs-24 fs-sm-20 f-semi-b uppercase'>Presale will be started soon!</p>
+                    {START_DATE > getUTCNow() && (
+                      <p className='fs-22 fs-sm-20 f-semi-b uppercase color'>Presale will be started soon!</p>
                     )}
-                    {startTime > 0 && endTime > 0 && startTime < getUTCNow() && endTime > getUTCNow() && (
-                      <p className='fs-24 fs-sm-20 f-semi-b uppercase'>Presale has started!</p>
+                    {START_DATE < getUTCNow() && END_DATE > getUTCNow() && (
+                      <p className='fs-22 fs-sm-20 f-semi-b uppercase color'>Presale has started!</p>
                     )}
-                    {endTime > 0 && endTime < getUTCNow() && (
-                      <p className='fs-24 fs-sm-20 f-semi-b uppercase'>Presale has ended!</p>
+                    {END_DATE < getUTCNow() && (
+                      <p className='fs-22 fs-sm-20 f-semi-b uppercase color'>Presale has ended!</p>
                     )}
                   </>
                 </Reveal>

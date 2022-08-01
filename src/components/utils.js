@@ -225,7 +225,7 @@ export function getTime(date) {
 export function getUTCDate(timestamp) {
   const num_time = parseInt(timestamp) * 1000;
   const date = new Date(num_time);
-  return moment.utc(date).format("MMMM Do, HH:mm UTC");
+  return moment.utc(date).format("MMM Do, HH:mm UTC");
 }
 
 export function getUTCDateTime(timestamp) {

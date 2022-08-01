@@ -1,22 +1,22 @@
 import { config } from "./config";
 import { getUTCNow, parseErrorMsg } from '../components/utils';
 import store from "../store";
-const MagicABI = config.MagicAbi;
-const MagicAddress = config.MagicAddress;
-const AvaxAddress = config.AvaxAddress;
-const USDCABI = config.USDCAbi;
-const USDCAddress = config.USDCAddress;
-const JOEABI = config.JoeRouterAbi;
-const JOEAddress = config.JoeRouterAddress;
-const AvaxMagicPairAddress = config.avaxMagicPair;
-const AvaxMagicPairABI = config.avaxMagicAbi;
+const BONSAIABI = config.BONSAIAbi;
+const BONSAIAddress = config.BONSAIAddress;
+const BNBAddress = config.BNBAddress;
+const USDCABI = null;
+const USDCAddress = null;
+const JOEABI = null;
+const JOEAddress = null;
+const BNBBONSAIPairAddress = null;
+const BNBBONSAIPairABI = null;
 const MAX_APPROVE_AMOUNT = 2 ** 32 - 1;
 
 export const getReservesForPair = async () => {
   const web3 = store.getState().auth.web3;
   if (!web3) return { success: false }
   try {
-    const PairContract = new web3.eth.Contract(AvaxMagicPairABI, AvaxMagicPairAddress);
+    const PairContract = new web3.eth.Contract(BNBBONSAIPairABI, BNBBONSAIPairAddress);
     const result = await PairContract.methods.getReserves().call();
     const reserves = [];
     reserves.push(web3.utils.fromWei(result._reserve0)); // reserve[0] should be AVAX
@@ -53,11 +53,11 @@ export const getAmountsOut = async (amountIn, coin_arrange, coin_type) => {
         path.push(USDCAddress);
         from_decimal = 'mwei';
       }
-      path.push(AvaxAddress);
-      path.push(MagicAddress);
+      path.push(BNBAddress);
+      path.push(BONSAIAddress);
     } else {
-      path.push(MagicAddress);
-      path.push(AvaxAddress);
+      path.push(BONSAIAddress);
+      path.push(BNBAddress);
       if (coin_type === 1) {
         path.push(USDCAddress);
         to_decimal = 'mwei';
@@ -99,11 +99,11 @@ export const getAmountsIn = async (amountOut, coin_arrange, coin_type) => {
         path.push(USDCAddress);
         to_decimal = 'mwei';
       }
-      path.push(AvaxAddress);
-      path.push(MagicAddress);
+      path.push(BNBAddress);
+      path.push(BONSAIAddress);
     } else {
-      path.push(MagicAddress);
-      path.push(AvaxAddress);
+      path.push(BONSAIAddress);
+      path.push(BNBAddress);
       if (coin_type === 1) {
         path.push(USDCAddress);
         from_decimal = 'mwei';
@@ -124,21 +124,21 @@ export const getAmountsIn = async (amountOut, coin_arrange, coin_type) => {
   }
 }
 
-export const getMagicAllowance = async () => {
+export const getBONSAIAllowance = async () => {
   const web3 = store.getState().auth.web3;
   if (!web3) return { success: false }
   try {
     const accounts = await web3.eth.getAccounts();
     if (accounts.length === 0) return { success: false }
-    const MagicContract = new web3.eth.Contract(MagicABI, MagicAddress);
-    let ret_allowance = await MagicContract.methods.allowance(accounts[0], JOEAddress).call();
+    const BONSAIContract = new web3.eth.Contract(BONSAIABI, BONSAIAddress);
+    let ret_allowance = await BONSAIContract.methods.allowance(accounts[0], JOEAddress).call();
     if (web3.utils.fromWei(ret_allowance) >= MAX_APPROVE_AMOUNT) {
       return true;
     } else {
       return false;
     }
   } catch (error) {
-    console.log('[Magic Allowance] = ', error);
+    console.log('[BONSAI Allowance] = ', error);
     return {
       success: false,
       result: "Something went wrong "
@@ -168,20 +168,20 @@ export const getUSDCAllowance = async () => {
   }
 }
 
-export const approveMagic = async () => {
+export const approveBONSAI = async () => {
   const web3 = store.getState().auth.web3;
   if (!web3) return { success: false }
   try {
     const accounts = await web3.eth.getAccounts();
     if (accounts.length === 0) return { success: false }
     const maxAmount = web3.utils.toWei(MAX_APPROVE_AMOUNT.toString());
-    const MagicContract = new web3.eth.Contract(MagicABI, MagicAddress);
-    await MagicContract.methods.approve(JOEAddress, maxAmount).send({ from: accounts[0] });
+    const BONSAIContract = new web3.eth.Contract(BONSAIABI, BONSAIAddress);
+    await BONSAIContract.methods.approve(JOEAddress, maxAmount).send({ from: accounts[0] });
     return {
       success: true
     }
   } catch (error) {
-    console.log('[Approve Magic] = ', error);
+    console.log('[Approve BONSAI] = ', error);
     return {
       success: false,
       result: "Something went wrong "
@@ -234,11 +234,11 @@ export const swap = async (amountInRaw, amountOutRaw, exactToken, amountMinMax, 
         decimal = 'mwei';
         max_decimal = 'mwei';
       }
-      path.push(AvaxAddress);
-      path.push(MagicAddress);
+      path.push(BNBAddress);
+      path.push(BONSAIAddress);
     } else {
-      path.push(MagicAddress);
-      path.push(AvaxAddress);
+      path.push(BONSAIAddress);
+      path.push(BNBAddress);
       if (coin_type === 1) {
         path.push(USDCAddress);
         if (exactToken) {

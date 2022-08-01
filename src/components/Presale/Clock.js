@@ -28,7 +28,6 @@ class Clock extends Component {
 
     if (time < 0) {
       this.setState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      this.props.setEnded(true);
     } else {
       const seconds = Math.floor((time / 1000) % 60);
       const minutes = Math.floor((time / 1000 / 60) % 60);

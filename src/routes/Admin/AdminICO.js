@@ -2,28 +2,27 @@ import React from 'react';
 import Reveal from 'react-awesome-reveal';
 import { useDispatch } from 'react-redux';
 import { createGlobalStyle } from 'styled-components';
-import AdapterMoment from '@mui/lab/AdapterMoment';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import DateTimePicker from '@mui/lab/DateTimePicker';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import TextField from '@mui/material/TextField';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import moment from 'moment';
-import $ from 'jquery';
-import { toast } from 'react-toastify';
-import {
-  setPresaleStartTime,
-  setPresaleEndTime,
-  setFeesOnNormalTransfer,
-  setInitialDistributionFinished,
-  setFeeReceivers,
-  setFees,
-  setMaxCap,
-  setMinCap
-} from '../../core/web3'
+import MainHeader from '../../components/menu/MainHeader';
+// import {
+//   setPresaleStartTime,
+//   setPresaleEndTime,
+//   setFeesOnNormalTransfer,
+//   setInitialDistributionFinished,
+//   setFeeReceivers,
+//   setFees,
+//   setMaxCap,
+//   setMinCap
+// } from '../../core/web3'
 import {
   fadeIn,
   fadeInUp,
-  isEmpty,
+  // isEmpty,
   // getDate,
   // getUTCDate,
   // getUTCNow,
@@ -42,8 +41,10 @@ const GlobalStyles = createGlobalStyle`
     .ico-header {
       max-width: 900px;
       padding: 20px;
+      padding-top: 100px;
       .ico-title {
         font-size: 36px;
+        color: #96BF49;
       }
       .ico-desc {
         font-size: 20px;
@@ -81,6 +82,7 @@ const GlobalStyles = createGlobalStyle`
     border: solid 1.5px rgba(140, 145, 255, 0.15);
     border-radius: 8px;
     padding: 10px;
+    color: black;
     &.main {
       background: linear-gradient(180deg, #291C75 0%, rgba(99, 86, 233, 0) 100%);
     }
@@ -113,11 +115,11 @@ const GlobalStyles = createGlobalStyle`
       margin: 0;
     }
     .MuiOutlinedInput-root {
-      border: solid 1px white !important;
+      border: solid 1px #222 !important;
       background: transparent !important;
-      color: white !important;
+      color: #222 !important;
       &:hover {
-        border: solid 1px white !important;
+        border: solid 1px #222 !important;
       }
     }
   
@@ -126,7 +128,7 @@ const GlobalStyles = createGlobalStyle`
     }
 
     .MuiSvgIcon-root {
-      color: white !important;
+      color: #222 !important;
     }
   }
 `;
@@ -167,11 +169,11 @@ const theme = createTheme({
         root: {
           '&.Mui-focused': {
             top: '-10px !important',
-            color: 'white',
+            color: 'black',
           }
         },
         shrink: {
-          color: 'white',
+          color: 'black',
           fontSize: '18px',
           top: '-10px',
           transform: 'translate(14px, -9px) scale(0.75)'
@@ -184,28 +186,28 @@ const theme = createTheme({
 const AdminICO = (props) => {
   const [date_start, setDate_start] = React.useState();
   const [date_end, setDate_end] = React.useState(new Date());
-  const [feeOnNormal, setFeeOnNormal] = React.useState(true);
-  const [initDistribution, setInitDistribution] = React.useState(true);
-  const [input_data, setInputData] = React.useState({
-    liquidity_receiver: '',
-    treasury_receiver: '',
-    risk_free_value_receiver: '',
-    operation_receiver: '',
-    x_magic_receiver: '',
-    future_ecosystem_receiver: '',
-    burn_receiver: '',
-    fee_kind: 0,
-    total: '',
-    liquidity_fee: '',
-    risk_free_value_fee: '',
-    treasury_fee: '',
-    fee_fee: '',
-    operation_fee: '',
-    x_magic_fee: '',
-    burn_fee: '',
-    min_cap: '',
-    max_cap: ''
-  });
+  // const [feeOnNormal, setFeeOnNormal] = React.useState(true);
+  // const [initDistribution, setInitDistribution] = React.useState(true);
+  // const [input_data, setInputData] = React.useState({
+  //   liquidity_receiver: '',
+  //   treasury_receiver: '',
+  //   risk_free_value_receiver: '',
+  //   operation_receiver: '',
+  //   x_BONSAI_receiver: '',
+  //   future_ecosystem_receiver: '',
+  //   burn_receiver: '',
+  //   fee_kind: 0,
+  //   total: '',
+  //   liquidity_fee: '',
+  //   risk_free_value_fee: '',
+  //   treasury_fee: '',
+  //   fee_fee: '',
+  //   operation_fee: '',
+  //   x_BONSAI_fee: '',
+  //   burn_fee: '',
+  //   min_cap: '',
+  //   max_cap: ''
+  // });
 
   const dispatch = useDispatch();
   const handleDate_start = (newValue) => {
@@ -216,25 +218,18 @@ const AdminICO = (props) => {
     setDate_end(newValue);
   };
 
-  const handleFeeOnNormal = (event) => {
-    setFeeOnNormal(event.target.value === '0' ? false : true);
-  }
-
-  const handleInitDistribution = (event) => {
-    setInitDistribution(event.target.value === '0' ? false : true);
-  }
-
   const onClick_SetStartDate = async () => {
     dispatch(showLoader());
     const start = Math.floor(moment(date_start).valueOf() / 1000);
     const timezoneOffset = new Date().getTimezoneOffset() * 60;
     const real_time = start - timezoneOffset;
-    let result = await setPresaleStartTime(real_time);
-    if (result.success) {
-      toast.success('Updated the start time successfully.');
-    } else {
-      toast.error('The transaction has been failed: ' + result.error);
-    }
+    console.log('[Time] = ', real_time)
+    // let result = await setPresaleStartTime(real_time);
+    // if (result.success) {
+    //   toast.success('Updated the start time successfully.');
+    // } else {
+    //   toast.error('The transaction has been failed: ' + result.error);
+    // }
     dispatch(hideLoader());
   }
 
@@ -243,191 +238,201 @@ const AdminICO = (props) => {
     const end = Math.floor(moment(date_end).valueOf() / 1000);
     const timezoneOffset = new Date().getTimezoneOffset() * 60;
     const real_time = end - timezoneOffset;
-    let result = await setPresaleEndTime(real_time);
-    if (result.success) {
-      toast.success('Updated the end time successfully.');
-    } else {
-      toast.error('The transaction has been failed: ' + result.error);
-    }
+    console.log('[Time] = ', real_time)
+    // let result = await setPresaleEndTime(real_time);
+    // if (result.success) {
+    //   toast.success('Updated the end time successfully.');
+    // } else {
+    //   toast.error('The transaction has been failed: ' + result.error);
+    // }
     dispatch(hideLoader());
   }
 
-  const onClick_FeesOnNormal = async () => {
-    dispatch(showLoader());
-    let result = await setFeesOnNormalTransfer(feeOnNormal);
-    if (result.success) {
-      toast.success('Updated the value successfully.');
-    } else {
-      toast.error('The transaction has bee failed: ' + result.error);
-    }
-    dispatch(hideLoader());
-  }
+  // const handleFeeOnNormal = (event) => {
+  //   setFeeOnNormal(event.target.value === '0' ? false : true);
+  // }
 
-  const onClick_InitDistribution = async () => {
-    dispatch(showLoader());
-    let result = await setInitialDistributionFinished(initDistribution);
-    if (result.success) {
-      toast.success('Updated the value successfully.');
-    } else {
-      toast.error('The transaction has bee failed: ' + result.error);
-    }
-    dispatch(hideLoader());
-  }
+  // const handleInitDistribution = (event) => {
+  //   setInitDistribution(event.target.value === '0' ? false : true);
+  // }
 
-  const onClick_MinCap = async () => {
-    if (isEmpty(input_data.min_cap) || Number(input_data.min_cap) === 0) {
-      $(`input[name='min_cap']`).focus();
-      toast.warning('Please insert a valid value');
-      return;
-    }
-    dispatch(showLoader());
-    let result = await setMinCap(input_data.min_cap);
-    if (result.success) {
-      toast.success('Updated the value successfully.');
-    } else {
-      toast.error('The transaction has bee failed: ' + result.error);
-    }
-    dispatch(hideLoader());
-  }
+  // const onClick_FeesOnNormal = async () => {
+  //   dispatch(showLoader());
+  //   let result = await setFeesOnNormalTransfer(feeOnNormal);
+  //   if (result.success) {
+  //     toast.success('Updated the value successfully.');
+  //   } else {
+  //     toast.error('The transaction has bee failed: ' + result.error);
+  //   }
+  //   dispatch(hideLoader());
+  // }
 
-  const onClick_MaxCap = async () => {
-    if (isEmpty(input_data.max_cap) || Number(input_data.max_cap) === 0) {
-      $(`input[name='max_cap']`).focus();
-      toast.warning('Please insert a valid value');
-      return;
-    }
-    dispatch(showLoader());
-    let result = await setMaxCap(input_data.max_cap);
-    if (result.success) {
-      toast.success('Updated the value successfully.');
-    } else {
-      toast.error('The transaction has bee failed: ' + result.error);
-    }
-    dispatch(hideLoader());
-  }
+  // const onClick_InitDistribution = async () => {
+  //   dispatch(showLoader());
+  //   let result = await setInitialDistributionFinished(initDistribution);
+  //   if (result.success) {
+  //     toast.success('Updated the value successfully.');
+  //   } else {
+  //     toast.error('The transaction has bee failed: ' + result.error);
+  //   }
+  //   dispatch(hideLoader());
+  // }
 
-  const receiver_Validation = () => {
-    let result = true;
-    if (isEmpty(input_data.liquidity_receiver)) {
-      $(`input[name='liquidity_receiver']`).focus();
-      result = false;
-    }
-    else if (isEmpty(input_data.treasury_receiver)) {
-      $(`input[name='treasury_receiver']`).focus();
-      result = false;
-    }
-    else if (isEmpty(input_data.risk_free_value_receiver)) {
-      $(`input[name='risk_free_value_receiver']`).focus();
-      result = false;
-    }
-    else if (isEmpty(input_data.operation_receiver)) {
-      $(`input[name='operation_receiver']`).focus();
-      result = false;
-    }
-    else if (isEmpty(input_data.x_magic_receiver)) {
-      $(`input[name='x_magic_receiver']`).focus();
-      result = false;
-    }
-    else if (isEmpty(input_data.future_ecosystem_receiver)) {
-      $(`input[name='future_ecosystem_receiver']`).focus();
-      result = false;
-    }
-    else if (isEmpty(input_data.burn_receiver)) {
-      $(`input[name='burn_receiver']`).focus();
-      result = false;
-    }
-    if (!result) {
-      toast.warning('Please insert a valid value');
-    }
-    return result;
-  }
+  // const onClick_MinCap = async () => {
+  //   if (isEmpty(input_data.min_cap) || Number(input_data.min_cap) === 0) {
+  //     $(`input[name='min_cap']`).focus();
+  //     toast.warning('Please insert a valid value');
+  //     return;
+  //   }
+  //   dispatch(showLoader());
+  //   let result = await setMinCap(input_data.min_cap);
+  //   if (result.success) {
+  //     toast.success('Updated the value successfully.');
+  //   } else {
+  //     toast.error('The transaction has bee failed: ' + result.error);
+  //   }
+  //   dispatch(hideLoader());
+  // }
 
-  const fee_Validation = () => {
-    let result = true;
-    if (isEmpty(input_data.fee_kind)) {
-      $(`input[name='fee_kind']`).focus();
-      result = false;
-    }
-    else if (isEmpty(input_data.total)) {
-      $(`input[name='total']`).focus();
-      result = false;
-    }
-    else if (isEmpty(input_data.liquidity_fee)) {
-      $(`input[name='liquidity_fee']`).focus();
-      result = false;
-    }
-    else if (isEmpty(input_data.risk_free_value_fee)) {
-      $(`input[name='risk_free_value_fee']`).focus();
-      result = false;
-    }
-    else if (isEmpty(input_data.treasury_fee)) {
-      $(`input[name='treasury_fee']`).focus();
-      result = false;
-    }
-    else if (isEmpty(input_data.fee_fee)) {
-      $(`input[name='fee_fee']`).focus();
-      result = false;
-    }
-    else if (isEmpty(input_data.operation_fee)) {
-      $(`input[name='operation_fee']`).focus();
-      result = false;
-    }
-    else if (isEmpty(input_data.x_magic_fee)) {
-      $(`input[name='x_magic_fee']`).focus();
-      result = false;
-    }
-    else if (isEmpty(input_data.burn_fee)) {
-      $(`input[name='burn_fee']`).focus();
-      result = false;
-    }
-    if (!result) {
-      toast.warning('Please insert a valid value');
-    }
-    return result;
-  }
+  // const onClick_MaxCap = async () => {
+  //   if (isEmpty(input_data.max_cap) || Number(input_data.max_cap) === 0) {
+  //     $(`input[name='max_cap']`).focus();
+  //     toast.warning('Please insert a valid value');
+  //     return;
+  //   }
+  //   dispatch(showLoader());
+  //   let result = await setMaxCap(input_data.max_cap);
+  //   if (result.success) {
+  //     toast.success('Updated the value successfully.');
+  //   } else {
+  //     toast.error('The transaction has bee failed: ' + result.error);
+  //   }
+  //   dispatch(hideLoader());
+  // }
 
-  const onClick_FeesReceiver = async () => {
-    if (!receiver_Validation()) {
-      return;
-    }
-    dispatch(showLoader());
-    const result = await setFeeReceivers(input_data);
-    if (result.success) {
-      toast.success('Updated the value successfully.');
-    } else {
-      toast.error('The transaction has bee failed: ' + result.error);
-    }
-    dispatch(hideLoader());
-  }
+  // const receiver_Validation = () => {
+  //   let result = true;
+  //   if (isEmpty(input_data.liquidity_receiver)) {
+  //     $(`input[name='liquidity_receiver']`).focus();
+  //     result = false;
+  //   }
+  //   else if (isEmpty(input_data.treasury_receiver)) {
+  //     $(`input[name='treasury_receiver']`).focus();
+  //     result = false;
+  //   }
+  //   else if (isEmpty(input_data.risk_free_value_receiver)) {
+  //     $(`input[name='risk_free_value_receiver']`).focus();
+  //     result = false;
+  //   }
+  //   else if (isEmpty(input_data.operation_receiver)) {
+  //     $(`input[name='operation_receiver']`).focus();
+  //     result = false;
+  //   }
+  //   else if (isEmpty(input_data.x_BONSAI_receiver)) {
+  //     $(`input[name='x_BONSAI_receiver']`).focus();
+  //     result = false;
+  //   }
+  //   else if (isEmpty(input_data.future_ecosystem_receiver)) {
+  //     $(`input[name='future_ecosystem_receiver']`).focus();
+  //     result = false;
+  //   }
+  //   else if (isEmpty(input_data.burn_receiver)) {
+  //     $(`input[name='burn_receiver']`).focus();
+  //     result = false;
+  //   }
+  //   if (!result) {
+  //     toast.warning('Please insert a valid value');
+  //   }
+  //   return result;
+  // }
 
-  const onClick_SetFees = async () => {
-    if (!fee_Validation()) {
-      return;
-    }
-    dispatch(showLoader());
-    const result = await setFees(input_data)
-    if (result.success) {
-      toast.success('Updated the value successfully.');
-    } else {
-      toast.error('The transaction has bee failed: ' + result.error);
-    }
-    dispatch(hideLoader());
-  }
+  // const fee_Validation = () => {
+  //   let result = true;
+  //   if (isEmpty(input_data.fee_kind)) {
+  //     $(`input[name='fee_kind']`).focus();
+  //     result = false;
+  //   }
+  //   else if (isEmpty(input_data.total)) {
+  //     $(`input[name='total']`).focus();
+  //     result = false;
+  //   }
+  //   else if (isEmpty(input_data.liquidity_fee)) {
+  //     $(`input[name='liquidity_fee']`).focus();
+  //     result = false;
+  //   }
+  //   else if (isEmpty(input_data.risk_free_value_fee)) {
+  //     $(`input[name='risk_free_value_fee']`).focus();
+  //     result = false;
+  //   }
+  //   else if (isEmpty(input_data.treasury_fee)) {
+  //     $(`input[name='treasury_fee']`).focus();
+  //     result = false;
+  //   }
+  //   else if (isEmpty(input_data.fee_fee)) {
+  //     $(`input[name='fee_fee']`).focus();
+  //     result = false;
+  //   }
+  //   else if (isEmpty(input_data.operation_fee)) {
+  //     $(`input[name='operation_fee']`).focus();
+  //     result = false;
+  //   }
+  //   else if (isEmpty(input_data.x_BONSAI_fee)) {
+  //     $(`input[name='x_BONSAI_fee']`).focus();
+  //     result = false;
+  //   }
+  //   else if (isEmpty(input_data.burn_fee)) {
+  //     $(`input[name='burn_fee']`).focus();
+  //     result = false;
+  //   }
+  //   if (!result) {
+  //     toast.warning('Please insert a valid value');
+  //   }
+  //   return result;
+  // }
 
-  const handleChange = (event) => {
-    const inputData = input_data;
-    inputData[event.target.name] = event.target.value;
-    setInputData(inputData);
-  }
+  // const onClick_FeesReceiver = async () => {
+  //   if (!receiver_Validation()) {
+  //     return;
+  //   }
+  //   dispatch(showLoader());
+  //   const result = await setFeeReceivers(input_data);
+  //   if (result.success) {
+  //     toast.success('Updated the value successfully.');
+  //   } else {
+  //     toast.error('The transaction has bee failed: ' + result.error);
+  //   }
+  //   dispatch(hideLoader());
+  // }
 
-  const handleFeeKind = (event) => {
-    const inputData = input_data;
-    inputData.fee_kind = Number(event.target.value);
-    setInputData(inputData);
-  }
+  // const onClick_SetFees = async () => {
+  //   if (!fee_Validation()) {
+  //     return;
+  //   }
+  //   dispatch(showLoader());
+  //   const result = await setFees(input_data)
+  //   if (result.success) {
+  //     toast.success('Updated the value successfully.');
+  //   } else {
+  //     toast.error('The transaction has bee failed: ' + result.error);
+  //   }
+  //   dispatch(hideLoader());
+  // }
+
+  // const handleChange = (event) => {
+  //   const inputData = input_data;
+  //   inputData[event.target.name] = event.target.value;
+  //   setInputData(inputData);
+  // }
+
+  // const handleFeeKind = (event) => {
+  //   const inputData = input_data;
+  //   inputData.fee_kind = Number(event.target.value);
+  //   setInputData(inputData);
+  // }
 
   return (
     <>
+      <MainHeader showMenu={true} />
       <ThemeProvider theme={theme}>
         <div className='page-container text-center ico-container' style={{ background: `url(/img/main-back.png)` }}>
           <GlobalStyles />
@@ -442,12 +447,12 @@ const AdminICO = (props) => {
                 <div className="row gap-2">
                   <div className='col-md-12'>
                     <div className="admin-input-section select-date">
-                      <span className='text-left'>Start Time: </span>
-                      <LocalizationProvider dateAdapter={AdapterMoment}>
+                      <span className='input-title text-left'>Start Time: </span>
+                      <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DateTimePicker
+                          renderInput={(props) => <TextField {...props} />}
                           value={date_start}
                           onChange={handleDate_start}
-                          renderInput={(params) => <TextField {...params} />}
                         />
                       </LocalizationProvider>
                       <button className='btn-main btn4' onClick={() => { onClick_SetStartDate() }}>SET</button>
@@ -455,8 +460,8 @@ const AdminICO = (props) => {
                   </div>
                   <div className='col-md-12'>
                     <div className="admin-input-section select-date">
-                      <span className='text-left'>End Time: </span>
-                      <LocalizationProvider dateAdapter={AdapterMoment}>
+                      <span className='input-title text-left'>End Time: </span>
+                      <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DateTimePicker
                           value={date_end}
                           onChange={handleDate_end}
@@ -466,7 +471,7 @@ const AdminICO = (props) => {
                       <button className='btn-main btn4' onClick={() => { onClick_SetEndDate() }}>SET</button>
                     </div>
                   </div>
-                  <div className='col-md-12'>
+                  {/* <div className='col-md-12'>
                     <div className='admin-input-section'>
                       <span className='text-left'>Min Cap ($USDC)</span>
                       <input name="min_cap" type="number" onChange={handleChange}></input>
@@ -532,7 +537,7 @@ const AdminICO = (props) => {
                       <div className='col-md-6'>
                         <div className='flex flex-column'>
                           <span className='text-left'>xASTRO Receiver</span>
-                          <input name="x_magic_receiver" type="text" onChange={handleChange}></input>
+                          <input name="x_BONSAI_receiver" type="text" onChange={handleChange}></input>
                         </div>
                       </div>
                       <div className='col-md-6'>
@@ -609,7 +614,7 @@ const AdminICO = (props) => {
                       <div className='col-md-6'>
                         <div className='flex flex-column'>
                           <span className='text-left'>xASTRO Fee</span>
-                          <input name="x_magic_fee" type="number" onChange={handleChange}></input>
+                          <input name="x_BONSAI_fee" type="number" onChange={handleChange}></input>
                         </div>
                       </div>
                       <div className='col-md-6'>
@@ -622,7 +627,7 @@ const AdminICO = (props) => {
                         <button className='btn-main btn4' onClick={onClick_SetFees}>SET</button>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </section>
             </section>

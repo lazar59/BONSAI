@@ -81,7 +81,7 @@ const Sidebar = (props) => {
                 }`}
             >
               <div className='flex justify-center align-items-center'>
-                <i className="fa-solid fa-arrows-retweet fs-20"></i>
+                <i className="fa-solid fa-shuffle fs-20"></i>
               </div>
             </Link>
             <Link

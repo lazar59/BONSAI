@@ -15,10 +15,8 @@ import Sidebar from '../components/App/Sidebar';
 import * as selectors from '../store/selectors';
 import SelectCoin from '../components/swap/SelectSwapCoin';
 import { fadeInUp, numberWithCommas } from '../components/utils';
-import { getMagicPriceInWeb3 } from '../core/web3';
-import { getAmountsOut, swap, getMagicAllowance, getUSDCAllowance, approveMagic, approveUSDC, getAmountsIn, getReservesForPair } from '../core/SwapFactory';
+import { getAmountsOut, swap, getBONSAIAllowance, getUSDCAllowance, approveBONSAI, approveUSDC, getAmountsIn, getReservesForPair } from '../core/SwapFactory';
 import { config, def_config } from '../core/config';
-// import IFrame from '../components/swap/IFrame';
 
 const GlobalStyles = createGlobalStyle`
   .swap-container {
@@ -193,7 +191,7 @@ const style = {
   px: 3,
 };
 
-const magic_coin = [
+const BONSAI_coin = [
   { code: 2, label: 'BONSAI' },
 ];
 
@@ -208,13 +206,11 @@ const coinLabel = (arrange, coinType) => {
 }
 
 const Swap = (props) => {
-  const DEF_APY = 100003.37;
   const SWAP_FEE = def_config.SWAP_FEE;
   const AUTO_SLIPPAGE = def_config.AUTO_SLIPPAGE;
   const balance = useSelector(selectors.userBalance);
   const wallet = useSelector(selectors.userWallet);
   const web3 = useSelector(selectors.web3State);
-  const [tokenPrice, setTokenPrice] = useState(0);
   const [coinType, setCoinType] = useState(0);
   const [fromBalance, setFromBalance] = useState(0);
   const [toBalance, setToBalance] = useState(0);
@@ -222,7 +218,7 @@ const Swap = (props) => {
   const [isApprovedUSDC, setApproveUSDC] = useState(false);
   const [isApprovedASTRO, setApproveASTRO] = useState(false);
   const [providerFee, setProviderFee] = useState(0);
-  const [amountPerMagic, setAmountPerMagic] = useState(0);
+  const [amountPerBONSAI, setAmountPerBONSAI] = useState(0);
   const [slippage, setSlippage] = useState(AUTO_SLIPPAGE);
   const [reserves, setReserves] = useState([]); // 0: BONSAI 1: USDC
   const [priceImpact, setPriceImpact] = useState(0);
@@ -246,18 +242,18 @@ const Swap = (props) => {
   const handleFromPercent = async (value) => {
     return;
     // let balanceAmount = 0;
-    // if (balance.magicBalance !== '') {
+    // if (balance.BONSAIBalance !== '') {
     //   if (coin_arrange) {
     //     if (coinType === 0) {
-    //       setTokenAmountA(Number(balance.avaxBalance) * value / 100);
-    //       balanceAmount = Number(balance.avaxBalance) * value / 100;
+    //       setTokenAmountA(Number(balance.BNBBalance) * value / 100);
+    //       balanceAmount = Number(balance.BNBBalance) * value / 100;
     //     } else {
     //       setTokenAmountA(Number(balance.usdcBalance) * value / 100);
     //       balanceAmount = Number(balance.usdcBalance) * value / 100;
     //     }
     //   } else {
-    //     setTokenAmountA(Number(balance.magicBalance) * value / 100);
-    //     balanceAmount = Number(balance.magicBalance) * value / 100;
+    //     setTokenAmountA(Number(balance.BONSAIBalance) * value / 100);
+    //     balanceAmount = Number(balance.BONSAIBalance) * value / 100;
     //   }
     // }
     // if (balanceAmount <= 0) {
@@ -270,20 +266,20 @@ const Swap = (props) => {
 
   const handleSwapMax = (type) => {
     let balanceAmount = 0;
-    if (balance.magicBalance === '') return;
+    if (balance.BONSAIBalance === '') return;
 
     if (type === 1) {
       if (coin_arrange) {
         if (coinType === 0) {
-          setTokenAmountA(Number(balance.avaxBalance));
-          balanceAmount = Number(balance.avaxBalance);
+          setTokenAmountA(Number(balance.BNBBalance));
+          balanceAmount = Number(balance.BNBBalance);
         } else {
           setTokenAmountA(Number(balance.usdcBalance));
           balanceAmount = Number(balance.usdcBalance);
         }
       } else {
-        setTokenAmountA(Number(balance.magicBalance));
-        balanceAmount = Number(balance.magicBalance);
+        setTokenAmountA(Number(balance.BONSAIBalance));
+        balanceAmount = Number(balance.BONSAIBalance);
       }
 
       if (balanceAmount <= 0) {
@@ -294,12 +290,12 @@ const Swap = (props) => {
       }
     } else {
       if (coin_arrange) {
-        setTokenAmountB(Number(balance.magicBalance));
-        balanceAmount = Number(balance.magicBalance);
+        setTokenAmountB(Number(balance.BONSAIBalance));
+        balanceAmount = Number(balance.BONSAIBalance);
       } else {
         if (coinType === 0) {
-          setTokenAmountB(Number(balance.avaxBalance));
-          balanceAmount = Number(balance.avaxBalance);
+          setTokenAmountB(Number(balance.BNBBalance));
+          balanceAmount = Number(balance.BNBBalance);
         } else {
           setTokenAmountB(Number(balance.usdcBalance));
           balanceAmount = Number(balance.usdcBalance);
@@ -325,7 +321,7 @@ const Swap = (props) => {
   }
 
   const onClick_ApproveASTRO = async () => {
-    await approveMagic();
+    await approveBONSAI();
   }
 
   const onClick_ApproveUSDC = async () => {
@@ -422,10 +418,10 @@ const Swap = (props) => {
   }, [coinType, coin_arrange, exactToken]);
 
   const addTokenCallback = useCallback(async () => {
-    const tokenAddress = config.MagicAddress;
+    const tokenAddress = config.BONSAIAddress;
     const tokenSymbol = 'BONSAI';
     const tokenDecimals = 18;
-    const tokenImage = `https://raw.githubusercontent.com/traderjoe-xyz/joe-tokenlists/main/logos/${config.MagicAddress}/logo.png`;
+    const tokenImage = `https://raw.githubusercontent.com/traderjoe-xyz/joe-tokenlists/main/logos/${config.BONSAIAddress}/logo.png`;
 
     try {
       const wasAdded = await window.ethereum.request({
@@ -465,7 +461,7 @@ const Swap = (props) => {
     if (!web3) {
       return;
     }
-    let result = await getMagicAllowance();
+    let result = await getBONSAIAllowance();
     if (result) {
       setApproveASTRO(true);
     }
@@ -480,16 +476,6 @@ const Swap = (props) => {
   }, [web3, wallet]);
 
   useEffect(() => {
-    const getTokenPrice = async () => {
-      const result = await getMagicPriceInWeb3();
-      if (result.success) {
-        setTokenPrice(result.magicPrice);
-      }
-    }
-    getTokenPrice();
-  }, []);
-
-  useEffect(() => {
     let price = 0;
     let tax = 0;
     if (coin_arrange && Number(tokenAmountB) > 0) {
@@ -501,7 +487,7 @@ const Swap = (props) => {
     }
 
     setTradingTax(tax);
-    setAmountPerMagic(numberWithCommas(price, 10));
+    setAmountPerBONSAI(numberWithCommas(price, 10));
     setProviderFee(Number(tokenAmountA) * SWAP_FEE);
   }, [tokenAmountA, tokenAmountB, coin_arrange, SWAP_FEE]);
 
@@ -516,18 +502,18 @@ const Swap = (props) => {
   useEffect(() => {
     if (coin_arrange) {
       if (coinType === 0) {
-        setFromBalance(Number(balance.avaxBalance));
+        setFromBalance(Number(balance.BNBBalance));
       } else if (coinType === 1) {
         setFromBalance(Number(balance.usdcBalance));
       }
-      setToBalance(Number(balance.magicBalance));
+      setToBalance(Number(balance.BONSAIBalance));
     } else {
       if (coinType === 0) {
-        setToBalance(Number(balance.avaxBalance));
+        setToBalance(Number(balance.BNBBalance));
       } else if (coinType === 1) {
         setToBalance(Number(balance.usdcBalance));
       }
-      setFromBalance(Number(balance.magicBalance));
+      setFromBalance(Number(balance.BONSAIBalance));
     }
   }, [balance, coin_arrange, coinType]);
 
@@ -589,7 +575,7 @@ const Swap = (props) => {
                         {coin_arrange ? (
                           <SelectCoin className='select-coin' value={coinType} onChange={handleSelectCoin} />
                         ) : (
-                          <SelectCoin className='select-coin' value={2} coins={magic_coin} />
+                          <SelectCoin className='select-coin' value={2} coins={BONSAI_coin} />
                         )}
                       </div>
                     </div>
@@ -604,7 +590,7 @@ const Swap = (props) => {
                       <div className="d-flex justify-content-between">
                         <input type="number" className="input-token" name="input_from" placeholder='0.0' value={tokenAmountB} onChange={onChangeTokenAmountB} disabled></input>
                         {coin_arrange ? (
-                          <SelectCoin className='select-coin' value={2} coins={magic_coin} />
+                          <SelectCoin className='select-coin' value={2} coins={BONSAI_coin} />
                         ) : (
                           <SelectCoin className='select-coin' value={coinType} onChange={handleSelectCoin} />
                         )}
@@ -613,7 +599,7 @@ const Swap = (props) => {
                     <div className='flex flex-column mt-3'>
                       <div className='flex justify-between'>
                         <p>Price</p>
-                        <span className='fs-16'>{numberWithCommas(amountPerMagic, 8)} {coinType === 0 ? 'BNB' : 'BUSD'} per BONSAI</span>
+                        <span className='fs-16'>{numberWithCommas(amountPerBONSAI, 8)} {coinType === 0 ? 'BNB' : 'BUSD'} per BONSAI</span>
                       </div>
                       <div className='flex justify-between'>
                         <p>Slippage Tolerance</p>

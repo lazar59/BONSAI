@@ -5,11 +5,10 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import ReactLoading from 'react-loading';
 import Popover from '@mui/material/Popover';
-// import LogoAnim from './Logo';
 import { connectWallet, disconnect } from "../../core/web3";
 import * as selectors from '../../store/selectors';
 import { config } from "../../core/config";
-import { isMdScreen } from "../utils";
+import { isMdScreen, isMobile } from "../utils";
 
 setDefaultBreakpoints([
   { xs: 0 },
@@ -89,13 +88,18 @@ const Header = function ({ showMenu = false }) {
         <div className='logo'>
           <div className='navbar-title navbar-item'>
             <NavLink to="/">
-              <h2 className="logo-icon">BONSAI COIN</h2>
+              <img
+                src="/img/logo.png"
+                className="img-fluid d-block"
+                width={"200px"}
+                alt="#"
+              />
             </NavLink>
           </div>
         </div>
 
         <div className="d-flex justify-content-end gap-3">
-          {showMenu && (
+          {(showMenu || isMobile()) && (
             <>
               <BreakpointProvider>
                 <Breakpoint l down>
@@ -115,22 +119,22 @@ const Header = function ({ showMenu = false }) {
                     }}>
                     <div className='navbar-item'>
                       <NavLink to="/" onClick={handleClose}>
-                        Home
+                      <i className="fa-solid fa-house-chimney fs-18"></i> HOME
                       </NavLink>
                     </div>
                     <div className='navbar-item'>
                       <NavLink to="/presale" onClick={handleClose}>
-                        PRESALE
+                        <i className="fa-solid fa-rocket-launch fs-18"></i> PRESALE
                       </NavLink>
                     </div>
                     <div className='navbar-item'>
                       <NavLink to="/swap" onClick={handleClose}>
-                        SWAP
+                        <i className="fa-solid fa-shuffle fs-18"></i> SWAP
                       </NavLink>
                     </div>
                     <div className='navbar-item'>
                       <NavLink to="/" onClick={handleClose}>
-                        NFTs
+                        <i className="fa-solid fa-sun-plant-wilt fs-18"></i> NFTs
                       </NavLink>
                     </div>
                   </Popover>
@@ -140,7 +144,7 @@ const Header = function ({ showMenu = false }) {
                   <div className='menu'>
                     <div className='navbar-item'>
                       <NavLink to="/">
-                        Home
+                        HOME
                         <span className='lines'></span>
                       </NavLink>
                     </div>
@@ -183,7 +187,7 @@ const Header = function ({ showMenu = false }) {
                   pending ? (
                     <div className='connect-wal'>
                       <div className="flex gap-1 align-items-center" >
-                        <ReactLoading type={'spin'} width="25px" height="25px" color="#fff" />
+                        <ReactLoading type={'spin'} width="25px" height="25px" color="#000" />
                         <span className="text-gray">Pending...</span>
                       </div>
                     </div>

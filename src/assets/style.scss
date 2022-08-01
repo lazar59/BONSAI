@@ -1027,6 +1027,9 @@ a {
     width: max-content;
     padding-left: 80px;
     padding-right: 30px;
+    @media only screen and (max-width: 1024px) {
+      padding: 0px;
+    }
 
     .navbar-item {
       position: relative;
@@ -1067,42 +1070,42 @@ a {
       padding: 15px 0 10px;
     }
 
-    &.navbar {
-      position: relative;
+    // &.navbar {
+    //   position: relative;
 
-      .logo {
-        position: relative;
-        left: -10px;
-        display: inline-block;
-      }
+    //   .logo {
+    //     position: relative;
+    //     left: -10px;
+    //     display: inline-block;
+    //   }
 
-      .search {
-        display: inline-block;
-        position: relative;
-        top: -9px;
+    //   .search {
+    //     display: inline-block;
+    //     position: relative;
+    //     top: -9px;
 
-        #quick_search {
-          width: 100%;
-        }
-      }
+    //     #quick_search {
+    //       width: 100%;
+    //     }
+    //   }
 
-      .mainside {
-        position: absolute;
-        right: 60px;
-        top: 10px;
-      }
+    //   .mainside {
+    //     position: absolute;
+    //     right: 60px;
+    //     top: 10px;
+    //   }
 
-      .dropdown-custom.btn {
-        color: $gray;
-        width: 100%;
-        text-align: left;
+    //   .dropdown-custom.btn {
+    //     color: $gray;
+    //     width: 100%;
+    //     text-align: left;
 
-        &::after {
-          float: right;
-          font-size: .9rem;
-        }
-      }
-    }
+    //     &::after {
+    //       float: right;
+    //       font-size: .9rem;
+    //     }
+    //   }
+    // }
 
     .w-100-nav {
       display: block;
@@ -1140,6 +1143,12 @@ a {
       -webkit-border-radius: 2px;
     }
 
+    &.sticky {
+      position: absolute !important;
+    }
+  }
+
+  @media only screen and (max-width: 1024px) {
     #nav-icon span,
     .nav-icon span {
       display: none;
@@ -1174,10 +1183,6 @@ a {
       top: 10px;
       background-color: $black;
     }
-
-    &.sticky {
-      position: absolute !important;
-    }
   }
 
   @media only screen and (max-width: 641px) {
@@ -1195,7 +1200,7 @@ a {
 
       .logo {
         img {
-          width: 90%;
+          width: 130px;
         }
       }
     }
@@ -5775,9 +5780,9 @@ blockquote {
     }
   }
 
-  #myHeader .container {
-    max-width: unset !important;
-  }
+  // #myHeader .container {
+  //   max-width: unset !important;
+  // }
 
   .dropdown-toggle::after {
     top: 0;
