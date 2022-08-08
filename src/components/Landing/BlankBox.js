@@ -1,5 +1,8 @@
 import React from 'react';
 import { createGlobalStyle } from 'styled-components';
+import Reveal from 'react-awesome-reveal';
+import "react-circular-progressbar/dist/styles.css";
+import { fadeIn } from '../../components/utils';
 
 const GlobalStyles = createGlobalStyle`
   .blank-box {
@@ -34,9 +37,9 @@ const blankbox = () => (
   <div className='container blank-box'>
     <GlobalStyles />
     <div className='line-bg'></div>
-    <div className='shape-bg'>
+    <Reveal className='shape-bg onStep' keyframes={fadeIn} delay={300} duration={2000} triggerOnce>
       <img src="/img/shape-right.png" alt=""></img>
-    </div>
+    </Reveal>
   </div >
 );
 export default blankbox;

@@ -22,7 +22,7 @@ const Home = (props) => {
       </section>
 
       <section className='p-0'>
-        <Footer />
+        <Footer title={true} />
       </section>
     </div >
   )

@@ -14,6 +14,7 @@ import MainHeader from '../components/menu/MainHeader';
 import Sidebar from '../components/App/Sidebar';
 import * as selectors from '../store/selectors';
 import SelectCoin from '../components/swap/SelectSwapCoin';
+import Footer from '../components/menu/footer';
 import { fadeInUp, numberWithCommas } from '../components/utils';
 import { getAmountsOut, swap, getBONSAIAllowance, getUSDCAllowance, approveBONSAI, approveUSDC, getAmountsIn, getReservesForPair } from '../core/SwapFactory';
 import { config, def_config } from '../core/config';
@@ -727,6 +728,9 @@ const Swap = (props) => {
           </Box>
         </Modal>
       </div >
+      <section className='p-0'>
+        <Footer />
+      </section>
     </>
   );
 };

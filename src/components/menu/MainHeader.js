@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import ReactLoading from 'react-loading';
 import Popover from '@mui/material/Popover';
+import { useMediaQuery } from 'react-responsive';
 import { connectWallet, disconnect } from "../../core/web3";
 import * as selectors from '../../store/selectors';
 import { config } from "../../core/config";
@@ -34,6 +35,7 @@ const Header = function ({ showMenu = false }) {
   const web3 = useSelector(selectors.web3State);
   const pending = useSelector(selectors.loadingState);
   const chainId = useSelector(selectors.authChainID);
+  const isSmallMobile = useMediaQuery({ maxWidth: '575px' });
 
   const [anchorEl, setAnchorEl] = useState(null);
   const handleClick = (event) => {
@@ -88,12 +90,21 @@ const Header = function ({ showMenu = false }) {
         <div className='logo'>
           <div className='navbar-title navbar-item'>
             <NavLink to="/">
-              <img
-                src="/img/logo.png"
-                className="img-fluid d-block"
-                width={"200px"}
-                alt="#"
-              />
+              {isSmallMobile ? (
+                <img
+                  src="/img/logo-short.png"
+                  className="img-fluid d-block"
+                  width={"70px"}
+                  alt="#"
+                />
+              ) : (
+                <img
+                  src="/img/logo.png"
+                  className="img-fluid d-block"
+                  width={"200px"}
+                  alt="#"
+                />
+              )}
             </NavLink>
           </div>
         </div>
@@ -119,7 +130,7 @@ const Header = function ({ showMenu = false }) {
                     }}>
                     <div className='navbar-item'>
                       <NavLink to="/" onClick={handleClose}>
-                      <i className="fa-solid fa-house-chimney fs-18"></i> HOME
+                        <i className="fa-solid fa-house-chimney fs-18"></i> HOME
                       </NavLink>
                     </div>
                     <div className='navbar-item'>
@@ -133,7 +144,7 @@ const Header = function ({ showMenu = false }) {
                       </NavLink>
                     </div>
                     <div className='navbar-item'>
-                      <NavLink to="/" onClick={handleClose}>
+                      <NavLink to="/nfts" onClick={handleClose}>
                         <i className="fa-solid fa-sun-plant-wilt fs-18"></i> NFTs
                       </NavLink>
                     </div>
@@ -161,7 +172,7 @@ const Header = function ({ showMenu = false }) {
                       </NavLink>
                     </div>
                     <div className='navbar-item'>
-                      <NavLink to="/">
+                      <NavLink to="/nfts">
                         NFTs
                         <span className='lines'></span>
                       </NavLink>
@@ -194,11 +205,15 @@ const Header = function ({ showMenu = false }) {
                   ) : (
                     <div className="flex gap-3">
                       <div className="flex flex-column">
-                        <div className="connect-wal flex-column">
-                          <div className="flex">
-                            <span className="text-black">{userWalletState && (userWalletState.slice(0, 4) + "..." + userWalletState.slice(38))}</span>
+                        <div className="connect-wal">
+                          <div className='btn-wallet'>
+                            <i className="fa-regular fa-wallet fs-20"></i>
+                            <span>{userWalletState && (userWalletState.slice(0, 4) + "..." + userWalletState.slice(38))}</span>
+                            <i className="fa-solid fa-angle-down"></i>
                           </div>
-                          <button className="btn-disconnect fs-12" onClick={onDisconnect}>Disconnect</button>
+                          <div className="menu-disconnect">
+                            <button className="btn-disconnet" onClick={onDisconnect}>Disconnect</button>
+                          </div>
                         </div>
                       </div>
                     </div>

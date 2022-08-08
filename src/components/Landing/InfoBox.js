@@ -75,41 +75,43 @@ const infobox = () => (
   <div className='container'>
     <GlobalStyles />
     <div className='info-content'>
-      <div className='info-card'>
-        <div className='info-img-card'>
-          <div className='info-img info-img-1'></div>
-          <div className='info-img-preload-1'></div>
+      <Reveal keyframes={fadeInUp} className='onStep' delay={300} duration={500} triggerOnce cascade>
+        <div className='info-card'>
+          <div className='info-img-card'>
+            <div className='info-img info-img-1'></div>
+            <div className='info-img-preload-1'></div>
+          </div>
+          <span>marketing and continuing the development of new products</span>
         </div>
-        <span>marketing and continuing the development of new products</span>
-      </div>
-      <div className='info-card'>
-        <div className='info-img-card'>
-          <div className='info-img info-img-2'></div>
-          <div className='info-img-preload-2'></div>
+        <div className='info-card'>
+          <div className='info-img-card'>
+            <div className='info-img info-img-2'></div>
+            <div className='info-img-preload-2'></div>
+          </div>
+          <span>we will pick one random winner each that has purchased 100 coins</span>
         </div>
-        <span>we will pick one random winner each that has purchased 100 coins</span>
-      </div>
-      <div className='info-card'>
-        <div className='info-img-card'>
-          <div className='info-img info-img-3'></div>
-          <div className='info-img-preload-3'></div>
+        <div className='info-card'>
+          <div className='info-img-card'>
+            <div className='info-img info-img-3'></div>
+            <div className='info-img-preload-3'></div>
+          </div>
+          <span>Burning Bonsai weekly</span>
         </div>
-        <span>Burning Bonsai weekly</span>
-      </div>
-      <div className='info-card'>
-        <div className='info-img-card'>
-          <div className='info-img info-img-4'></div>
-          <div className='info-img-preload-4'></div>
+        <div className='info-card'>
+          <div className='info-img-card'>
+            <div className='info-img info-img-4'></div>
+            <div className='info-img-preload-4'></div>
+          </div>
+          <span>Each week all funds will be converted to BUSD</span>
         </div>
-        <span>Each week all funds will be converted to BUSD</span>
-      </div>
-      <div className='info-card'>
-        <div className='info-img-card'>
-          <div className='info-img info-img-5'></div>
-          <div className='info-img-preload-5'></div>
+        <div className='info-card'>
+          <div className='info-img-card'>
+            <div className='info-img info-img-5'></div>
+            <div className='info-img-preload-5'></div>
+          </div>
+          <span>Burning coins of different project</span>
         </div>
-        <span>Burning coins of different project</span>
-      </div>
+      </Reveal>
     </div>
   </div >
 );

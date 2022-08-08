@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Home from './routes/Home';
 import Presale from './routes/Presale';
 import Swap from './routes/Swap';
+import NFTs from './routes/Nfts';
 import AdminICO from './routes/Admin/AdminICO';
 import { loadWeb3 } from './core/web3';
 
@@ -30,7 +31,7 @@ const PosedRouter = ({ children }) => (
   </Location>
 );
 
-const path_list = ['', 'dashboard', 'account', 'swap', 'presale', 'control/admin'];
+const path_list = ['', 'dashboard', 'nfts', 'swap', 'presale', 'control/admin'];
 
 function App() {
   const [navSelected, setNavSelected] = useState('');
@@ -64,6 +65,7 @@ function App() {
             </Home>
             <Presale path="presale" />
             <Swap path="swap" />
+            <NFTs path="nfts" />
             <AdminICO path="control/admin" />
           </ScrollTop>
         </PosedRouter>

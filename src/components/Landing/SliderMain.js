@@ -186,13 +186,15 @@ const Slidermain = () => {
                 </div>
               </Reveal>
 
-              <div className='banner-shape'>
+              <Reveal keyframes={fadeInUp} className='banner-shape onStep' delay={1500} duration={800} triggerOnce>
                 <img src="/img/shape-left.png" alt=""></img>
-              </div>
+              </Reveal>
             </div>
           </div>
           <div className='col-lg-6 col-md-12 move-first flex align-items-center justify-center'>
-            <img src="/img/banner.png" className="crypto-logo-img" alt="BONSAI" />
+            <Reveal keyframes={fadeInUp} className='onStep' delay={600} duration={800} triggerOnce>
+              <img src="/img/banner.png" className="crypto-logo-img" alt="BONSAI" />
+            </Reveal>
           </div>
         </div>
       </div>

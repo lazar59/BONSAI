@@ -1,10 +1,13 @@
 import React from 'react';
 import { createGlobalStyle } from 'styled-components';
+import Reveal from 'react-awesome-reveal';
+import { fadeInUp } from '../utils';
 
 const GlobalStyles = createGlobalStyle`
   .footer-img {
     position: absolute;
     bottom: 0;
+    z-index: -1;
   }
   .single-line {
     width: 100%;
@@ -14,20 +17,24 @@ const GlobalStyles = createGlobalStyle`
     margin-bottom: 10px;
   }
 `;
-const footer = () => (
+const footer = ({ title = false }) => (
   <footer className="footer-light p-0">
     <GlobalStyles />
     <div className="container">
       <div className='footer-box'>
         <div className='row'>
-          <div className='col-md-5 relative'>
+          <Reveal keyframes={fadeInUp} className='col-md-5 onStep relative' delay={300} duration={600} triggerOnce style={{ zIndex: '-1'}}>
             <img className='footer-img' src="/img/plant.png" alt=""></img>
-          </div>
+          </Reveal>
           <div className='col-md-7'>
             <div className='footer-content'>
-              <span>Ready to be part of bonsai?</span>
-              <h2 className='text-black m-0'>Let's see if Bonsai is</h2>
-              <h2 className='text-black m-0'>right for you</h2>
+              {title && (
+                <Reveal keyframes={fadeInUp} className='onStep' delay={800} duration={600} triggerOnce>
+                  <span>Ready to be part of bonsai?</span>
+                  <h2 className='text-black m-0'>Let's see if Bonsai is</h2>
+                  <h2 className='text-black m-0'>right for you</h2>
+                </Reveal>
+              )}
               <div className='single-line' />
               <span className='bold color'>Follow us on:</span>
               <div className='flex flex-row gap-3'>

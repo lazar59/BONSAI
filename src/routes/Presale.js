@@ -31,6 +31,7 @@ const GlobalStyles = createGlobalStyle`
     flex-direction: column;
     color: black;
     padding-top: 100px;
+    position: relative;
     .ico-header {
       max-width: 900px;
       padding: 20px;
@@ -42,6 +43,13 @@ const GlobalStyles = createGlobalStyle`
       }
       .ico-desc {
         font-size: 20px;
+      }
+      .nfts-banner-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: -1;
       }
     }
     @media only screen and (max-width: 1400px) {
@@ -181,21 +189,8 @@ const GlobalStyles = createGlobalStyle`
 
   .progress-bg {
     @media only screen and (max-width: 576px) {
-      width: 60%;
+      width: 170px;
     }
-  }
-
-  .inverstors {
-    width: fit-content;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 25px;
-  }
-
-  .amount_bar_text {
-    display: flex;
-    justify-content: space-between;
   }
 
   .progress {
@@ -235,23 +230,49 @@ const GlobalStyles = createGlobalStyle`
   .backdrop-loading {
   }
   
-  .btn-change {
-    width: 40px;
-    height: 40px;
-    background-color: #8b86a4 !important;
-    border-radius: 50%;
-    margin-bottom: 8px !important;
-    color: white !important;
-    &:hover {
-      background-color: #8b86a4 !important;
-    }
-  }
-
   .presale-input {
     align-items: end;
     @media only screen and (max-width: 768px) {
       flex-direction: column;
       gap: 10px;
+    }
+  }
+
+  .presale__card {
+    height: 100%;
+    border: 2px solid #96BF49;
+    box-shadow: 0px 4px 4px rgb(0 0 0 / 17%);
+    border-radius: 45px;
+    padding: 20px;
+  }
+
+  .deposit__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    border: 2px solid #96BF49;
+    border-radius: 45px;
+    padding: 20px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.17);
+  }
+
+  .btn-deposit {
+    min-width: 180px !important;
+  }
+
+  .banner-shape {
+    position: absolute;
+    right: 0px;
+    top: 160px;
+    z-index: -1;
+    width: 300px;
+    img {
+      width: 100%;
+    }
+    @media only screen and (max-width: 992px) {
+      width: 150px;
     }
   }
 `;
@@ -455,13 +476,14 @@ const BONSAIICO = (props) => {
         <Sidebar />
         <GlobalStyles />
         <div className='ico-header'>
+          <img className='nfts-banner-img' src="./img/line-bg-2.png" alt=""></img>
           <Reveal className='onStep' keyframes={fadeInUp} delay={0} duration={600} triggerOnce>
             <p className='ico-title'>WELCOME TO OUR<br />PRESALE</p>
           </Reveal>
         </div>
         {(
           <>
-            <Reveal className='presale-content onStep' keyframes={fadeIn} delay={800} duration={800} triggerOnce>
+            <Reveal className='presale-content onStep' keyframes={fadeInUp} delay={300} duration={600} triggerOnce>
               <div className='presale-inner py-4'>
                 <div className="row text-center">
                   <div className='col-md-12 align-self-center'>
@@ -484,129 +506,133 @@ const BONSAIICO = (props) => {
                 </div>
               </div>
             </Reveal>
-            <Reveal className='presale-content main mt-3 onStep' keyframes={fadeIn} delay={800} duration={800} triggerOnce>
-              <div className='presale-inner py-4'>
-                <div className='fs-20 fs-sm-16 color_more'>
-                  <span>Presale Term - <strong>{getUTCDate(START_DATE)} ~ {getUTCDate(END_DATE)}</strong></span><br />
-                  <span>(We reach our goal of <strong>${numberWithCommas(def_config.MAX_PRESALE_AMOUNT)}</strong>)</span><br />
-                  <span>Our minimum limit will be <strong>{nftPrice} BNB</strong> and a max of <strong>{nftPrice * 5} BNB</strong></span><br />
-                </div>
-              </div>
+            <Reveal className='banner-shape onStep' keyframes={fadeIn} delay={500} duration={2000} triggerOnce>
+              <img src="/img/shape-right.png" alt=""></img>
             </Reveal>
-            <Reveal className='presale-content main mt-3 onStep' keyframes={fadeIn} delay={800} duration={800} triggerOnce>
-              <div className='presale-inner'>
-                <div className="row justify-center presale-back">
-                  <div className="col-md-6 col-sm-6 mt-1">
-                    <div className="amount_bar px-3">
-                      <h3 className='color_more'>Presale Amount Received</h3>
-                      <div className='progress-bg m-auto'>
-                        <AmountBackGradientSVG />
-                        <AmountGradientSVG />
-                        <CircularProgressbar
-                          value={amountPercent}
-                          text={`${numberWithCommas(amountPercent, 2)}%`}
-                          styles={buildStyles({
-                            pathColor: `url(#amount)`,
-                            textColor: '#00DB8B',
-                            strokeLinecap: "butt",
-                            trailColor: `url(#amountBack)`
-                          })}
-                        />
+            <Reveal className='onStep' keyframes={fadeInUp} delay={600} duration={600} triggerOnce>
+              <div className='row my-5 gap-4 gap-md-0 w-100'>
+                <div className='col-md-7 col-sm-12 align-items-stretch'>
+                  <div className='flex flex-column h-100 gap-3'>
+                    <div className='presale__card py-5'>
+                      <div className='fs-20 fs-sm-16 color_more'>
+                        <span className="color">Presale Term  {isMobile ? <br /> : '-'} <strong className="color_more">{getUTCDate(START_DATE)} ~ {getUTCDate(END_DATE)}</strong></span><br />
+                        <span className="color">(We reach our goal of {isMobile ? <br /> : ''} <strong className="color_more">${numberWithCommas(def_config.MAX_PRESALE_AMOUNT)}</strong>)</span><br />
+                        <span className="color">Our minimum limit will be {isMobile ? <br /> : ''} <strong className='color_more'>{nftPrice} BNB</strong> {isMobile ? <br /> : ''} and a max of {isMobile ? <br /> : ''} <strong className='color_more'>{nftPrice * 5} BNB</strong></span><br />
                       </div>
                     </div>
-                  </div>
-                  <div className="col-md-6 col-sm-6 mt-1">
-                    <div className="amount_bar px-3">
-                      <h3 className='color_more'>Your Hard Cap Amount</h3>
-                      <div className='progress-bg m-auto'>
-                        <CapBackGradientSVG />
-                        <CapGradientSVG />
-                        <CircularProgressbar
-                          value={capPercent}
-                          text={`${numberWithCommas(capPercent, 2)}%`}
-                          styles={buildStyles({
-                            pathColor: `url(#cap)`,
-                            textColor: '#EF1485',
-                            strokeLinecap: "butt",
-                            trailColor: `url(#capBack)`
-                          })}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className='col-md-12 mt-3'>
-                    <p className='fs-20 mb-1 color_more'>Presale Amount Received {isMobile ? <br /> : ':'} <strong className='bright-green'>${numberWithCommas(Number(presaleAmount) * Number(bnbPrice))} ({numberWithCommas(presaleAmount)} BNB)</strong></p>
-                    <p className='fs-20 mb-1 color_more'>User Amount Deposited {isMobile ? <br /> : ':'} <strong className='bright-green'>${numberWithCommas(Number(userCap) * Number(bnbPrice))} ({numberWithCommas(userCap)} BNB)</strong></p>
-                    <p className='fs-20 mb-1 color_more'>Maximum Presale Amount Allocated {isMobile ? <br /> : ':'} <strong className='bright-green'>${numberWithCommas(nftPrice * 5 * bnbPrice)} ({nftPrice * 5} BNB)</strong></p>
-                  </div>
-                </div>
-
-                <div className='row buy-back mt-5'>
-                  <div className='col-md-12 mt-3'>
-                    <div className='buy_content'>
-                      <div className='row'>
-                        <div className='col-md-12'>
-                          <p className='fs-20'>Please select the FNFT amount you'd like to deposit</p>
-                          <div className='flex align-items-center justify-evenly'>
-                            <div className="flex align-items-center justify-center gap-2">
-                              <img
-                                loading="lazy"
-                                width="30"
-                                src={'/img/icons/bnb.png'}
-                                alt={'BNB'}
+                    <div className='presale__card'>
+                      <div className="row justify-center">
+                        <div className="col-md-6 col-sm-6 mt-1">
+                          <div className="amount_bar px-3">
+                            <span className='fs-20 fs-sm-16 color_more font-bold'>Presale Amount Received</span>
+                            <div className='progress-bg m-auto mt-3'>
+                              <AmountBackGradientSVG />
+                              <AmountGradientSVG />
+                              <CircularProgressbar
+                                value={amountPercent}
+                                text={`${numberWithCommas(amountPercent, 2)}%`}
+                                styles={buildStyles({
+                                  pathColor: `url(#amount)`,
+                                  textColor: '#00DB8B',
+                                  strokeLinecap: "butt",
+                                  trailColor: `url(#amountBack)`
+                                })}
                               />
-                              <span className='fs-20'>BNB Price: <strong className='bright-green'>${numberWithCommas(bnbPrice)}</strong></span>
-                            </div>
-                            <div className="flex align-items-center justify-center gap-2">
-                              <img
-                                loading="lazy"
-                                width="30"
-                                src={'/img/icons/nft.png'}
-                                alt={'NFT'}
-                              />
-                              <span className='fs-20'>FNFT Price: <strong className='bright-green'>{numberWithCommas(nftPrice)} BNB</strong></span>
                             </div>
                           </div>
-                          <div className='presale-input flex justify-center flex-column'>
-                            <div className="nft_counter mb-1">
-                              <Slider
-                                centerMode={true}
-                                swipe={false}
-                                focusOnSelect={false}
-                                infinite={false}
-                                ref={slickRef}
-                                slidesToShow={1}
-                                slidesToScroll={1}
-                                vertical={true}
-                                afterChange={(value) => handleSlide(value)}
-                              >
-                                {slides.map((slide) => (
-                                  <div key={slide} className="counter_num">
-                                    {slide}
-                                  </div>
-                                ))}
-                              </Slider>
-                            </div>
-                            <div className='flex w-100 justify-center justify-content-evenly'>
-                              <span className='fs-20'>Amount: <strong>${numberWithCommas(Number(bnbPrice) * Number(bnbAmount))} ({bnbAmount} BNB)</strong></span>
-                              <span className='fs-20'>Balance: <strong>{numberWithCommas(bnbBalance)} BNB</strong></span>
+                        </div>
+                        <div className="col-md-6 col-sm-6 mt-1">
+                          <div className="amount_bar px-3">
+                            <span className='fs-20 fs-sm-16 color_more font-bold'>Your Hard Cap Amount</span>
+                            <div className='progress-bg m-auto mt-3'>
+                              <CapBackGradientSVG />
+                              <CapGradientSVG />
+                              <CircularProgressbar
+                                value={capPercent}
+                                text={`${numberWithCommas(capPercent, 2)}%`}
+                                styles={buildStyles({
+                                  pathColor: `url(#cap)`,
+                                  textColor: '#EF1485',
+                                  strokeLinecap: "butt",
+                                  trailColor: `url(#capBack)`
+                                })}
+                              />
                             </div>
                           </div>
                         </div>
                         <div className='col-md-12 mt-3'>
-                          <LoadingButton
-                            onClick={handleBuy}
-                            endIcon={<></>}
-                            loading={pending}
-                            loadingPosition="end"
-                            variant="contained"
-                            className="btn-main m-auto btn-deposit"
-                            disabled={!(START_DATE * 1000 < getUTCNow() && END_DATE * 1000 > getUTCNow())}
-                          >
-                            {isEmpty(wallet) ? 'CONNECT' : 'DEPOSIT'}
-                          </LoadingButton>
+                          <p className='fs-20 fs-sm-16 mb-1 color_more'>Presale Amount Received {isMobile ? <br /> : ':'} <strong className='bright-green'>${numberWithCommas(Number(presaleAmount) * Number(bnbPrice))} ({numberWithCommas(presaleAmount)} BNB)</strong></p>
+                          <p className='fs-20 fs-sm-16 mb-1 color_more'>User Amount Deposited {isMobile ? <br /> : ':'} <strong className='bright-green'>${numberWithCommas(Number(userCap) * Number(bnbPrice))} ({numberWithCommas(userCap)} BNB)</strong></p>
+                          <p className='fs-20 fs-sm-16 mb-1 color_more'>Maximum Presale Amount Allocated {isMobile ? <br /> : ':'} <strong className='bright-green'>${numberWithCommas(nftPrice * 5 * bnbPrice)} ({nftPrice * 5} BNB)</strong></p>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                </div>
+                <div className='col-md-5 col-sm-12 align-items-stretch'>
+                  <div className='presale__card'>
+                    <div className="flex h-100 flex-column justify-between gap-1">
+                      <p className='fs-20 fs-sm-16 px-md-5'>Please select the FNFT amount you'd like to deposit</p>
+                      <div className="deposit__item">
+                        <img
+                          loading="lazy"
+                          width="50"
+                          src={'/img/icons/bnb.png'}
+                          alt={'BNB'}
+                        />
+                        <div className='flex flex-column'>
+                          <span className='fs-22 fs-sm-20'>BNB Price</span>
+                          <span className='fs-20 fs-sm-18 font-bold bright-green'>${numberWithCommas(bnbPrice)}</span>
+                        </div>
+                      </div>
+                      <div className='presale-input flex justify-center flex-column'>
+                        <div className="nft_counter mb-1">
+                          <Slider
+                            centerMode={true}
+                            swipe={false}
+                            focusOnSelect={false}
+                            infinite={false}
+                            ref={slickRef}
+                            slidesToShow={1}
+                            slidesToScroll={1}
+                            vertical={true}
+                            afterChange={(value) => handleSlide(value)}
+                          >
+                            {slides.map((slide) => (
+                              <div key={slide} className="counter_num">
+                                {slide}
+                              </div>
+                            ))}
+                          </Slider>
+                        </div>
+                      </div>
+                      <div className="deposit__item">
+                        <img
+                          loading="lazy"
+                          width="50"
+                          src={'/img/icons/nft.png'}
+                          alt={'NFT'}
+                        />
+                        <div className='flex flex-column'>
+                          <span className='fs-22 fs-sm-20'>FNFT Price</span>
+                          <span className='fs-20 fs-sm-18 font-bold bright-green'>{numberWithCommas(nftPrice)} BNB</span>
+                        </div>
+                      </div>
+                      <div className='flex flex-column justify-center gap-2 py-3'>
+                        <span className='fs-20 fs-sm-16'>Amount: <strong>${numberWithCommas(Number(bnbPrice) * Number(bnbAmount))} ({bnbAmount} BNB)</strong></span>
+                        <span className='fs-20 fs-sm-16'>Balance: <strong>{numberWithCommas(bnbBalance)} BNB</strong></span>
+                      </div>
+                      <LoadingButton
+                        onClick={handleBuy}
+                        endIcon={<></>}
+                        loading={pending}
+                        loadingPosition="end"
+                        variant="contained"
+                        className="btn-main m-auto btn-deposit"
+                        disabled={!(START_DATE * 1000 < getUTCNow() && END_DATE * 1000 > getUTCNow())}
+                      >
+                        {isEmpty(wallet) ? 'CONNECT' : 'DEPOSIT'}
+                      </LoadingButton>
                     </div>
                   </div>
                 </div>

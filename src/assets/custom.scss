@@ -29,6 +29,10 @@ $bright-green: #44BF01;
   font-size: 30px;
 }
 
+a:hover {
+  color: #b8ff33;
+}
+
 .progres-area {
   .progress-top {
     position: absolute;
@@ -496,6 +500,10 @@ p {
   }
 }
 
+.f-poetsen {
+  font-family: 'PoetsenOne', sans-serif;
+}
+
 .ellipse {
   position: absolute;
   border-radius: 50%;
@@ -760,6 +768,7 @@ p {
   flex-direction: column;
   padding: 20px;
   text-align: center;
+  background-color: white;
 
   &.Clock-item-ex {
     background-color: $color;
@@ -1198,8 +1207,7 @@ input::-webkit-inner-spin-button {
 }
 
 .full-card {
-  background: rgba(150, 191, 73, 0.14);
-  ;
+  background: rgb(233 255 195 / 70%);
   border: 2px solid #96BF49;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.17);
   border-radius: 10px;
@@ -1303,6 +1311,7 @@ input::-webkit-inner-spin-button {
   align-items: center;
   padding-right: 20px;
   border-radius: 8px;
+  position: relative;
 }
 
 .btn-disconnect {
@@ -1486,6 +1495,9 @@ input::-webkit-inner-spin-button {
   width: 250px;
   margin-left: auto;
   margin-right: auto;
+  @media only screen and (max-width: 768px) {
+    width: 200px;
+  }
   .counter_num {
     font-weight: 500;
     font-size: 5rem;
@@ -1554,5 +1566,41 @@ input::-webkit-inner-spin-button {
       font-size: 42px;
       line-height: 0;
     }
+  }
+}
+
+.btn-wallet {
+  background: #E2FCCD;
+  border-radius: 50px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  span, i {
+    color: #759353;
+  }
+}
+
+.menu-disconnect {
+  display: none;
+  position: absolute;
+  top: 37px;
+  right: 20px;
+  padding: 10px;
+}
+
+.connect-wal:hover .menu-disconnect {
+  display: block;
+}
+
+.btn-disconnet {
+  padding: 10px 20px;
+  background: #e2fccd;
+  border-radius: 10px;
+  color: #759353;
+  &:hover {
+    background: #c0dea9;
   }
 }
