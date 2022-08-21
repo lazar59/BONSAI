@@ -519,7 +519,7 @@ const Swap = (props) => {
   }, [balance, coin_arrange, coinType]);
 
   useEffect(() => {
-    initialize();
+    // initialize();
   }, [initialize]);
 
   return (

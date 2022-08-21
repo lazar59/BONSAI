@@ -342,7 +342,7 @@ const BONSAIICO = (props) => {
   const isMobile = useMediaQuery({ maxWidth: '768px' });
   const START_DATE = def_config.START_TIME;
   const END_DATE = def_config.START_TIME + def_config.PRESALE_PERIOD * 3600 * 24;
-
+  const DEF_SLIDES = ["1", "2", "3", "4", "5"];
   const [slides, setSlides] = useState(["1", "2", "3", "4", "5"]);
   const [startTime, setStartTime] = useState(0);
   const [endTime, setEndTime] = useState(0);
@@ -386,6 +386,9 @@ const BONSAIICO = (props) => {
 
   const fetchFounderInfo = useCallback(async () => {
     console.log('[Wallet] = ', wallet);
+    if (isEmpty(wallet)) {
+      return;
+    }
     setBNBBalance(balance.BNBBalance);
     if (nftPrice <= 0) return;
     const result = await getFounderInfo();
@@ -393,12 +396,13 @@ const BONSAIICO = (props) => {
       const percent = (Number(result.amountBNB) * 100) / Number(nftPrice * 5);
       setCapPercent(percent);
       setUserCap(result.amountBNB);
-      const temp_slides = slides;
+      const temp_slides = DEF_SLIDES;
       const numberOfFNFT = result.numberOfFNFT;
+      console.log('[NumberOfNFT] = ', numberOfFNFT);
       temp_slides.splice(5 - numberOfFNFT, numberOfFNFT);
       setSlides(temp_slides);
     }
-  }, [balance.BNBBalance, nftPrice, slides, wallet]);
+  }, [balance.BNBBalance, nftPrice, wallet]);
 
   const fetchBNBPrice = async () => {
     const result = await getBNBPrice();
